@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>TGD Link Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 min-h-screen p-6">
+  <div class="max-w-5xl mx-auto bg-white shadow rounded p-6">
+
+    <h1 class="text-2xl font-bold mb-4">Redirect Links Admin</h1>
+
+    <!-- AUTH -->
+    <div id="authBox" class="mb-6">
+      <input id="tokenInput" type="password" placeholder="GitHub Personal Access Token"
+        class="border p-2 w-full mb-2">
+      <button onclick="login()"
+        class="bg-blue-600 text-white px-4 py-2 rounded">Login</button>
+    </div>
+
+    <!-- CONTROLS -->
+    <div id="controls" class="hidden mb-4 flex gap-2">
+      <input id="searchInput" placeholder="Search links..."
+        class="border p-2 flex-1">
+      <button onclick="openNewLink()"
+        class="bg-green-600 text-white px-4 py-2 rounded">New Link</button>
+      <button onclick="loadLinks()"
+        class="bg-gray-600 text-white px-4 py-2 rounded">Refresh</button>
+    </div>
+
+    <!-- LINKS LIST -->
+    <div id="linksList" class="space-y-2"></div>
+  </div>
+
+<script>
+const OWNER = "thegreekdirectory";
+const REPO = "links";
+const LINKS_PATH = "data/links.json";
+let token = "";
+let linksData = [];
+
+function login() {
+  token = document.getElementById("tokenInput").value;
+  document.getElementById("authBox").classList.add("hidden");
+  document.getElementById("controls").classList.remove("hidden");
+  loadLinks();
+}
+
+async function loadLinks() {
+  const res = await fetch(
+    `https://api.github.com/repos/${OWNER}/${REPO}/contents/${LINKS_PATH}`,
+    { headers: { Authorization: `token ${token}` } }
+  );
+  const data = await res.json();
+  linksData = JSON.parse(atob(data.content)).links;
+  renderLinks();
+}
+
+function renderLinks() {
+  const q = document.getElementById("searchInput").value.toLowerCase();
+  const list = document.getElementById("linksList");
+  list.innerHTML = "";
+
+  linksData
+    .filter(l =>
+      l.title.toLowerCase().includes(q) ||
+      l.path.toLowerCase().includes(q) ||
+      l.redirectTo.toLowerCase().includes(q)
+    )
+    .forEach(l => {
+      list.innerHTML += `
+        <div class="border p-3 rounded flex justify-between">
+          <div>
+            <div class="font-semibold">${l.title}</div>
+            <div class="text-sm text-gray-600">${l.path} → ${l.redirectTo}</div>
+          </div>
+          <button class="text-blue-600" onclick="editLink('${l.id}')">Edit</button>
+        </div>
+      `;
+    });
+}
+
+function openNewLink() {
+  const title = prompt("Title");
+  const path = prompt("URL Path (e.g. /a/b-1)");
+  const redirectTo = prompt("Redirect To URL");
+
+  if (!title || !path || !redirectTo) return;
+
+  linksData.push({
+    id: crypto.randomUUID(),
+    title,
+    path,
+    redirectTo
+  });
+
+  saveAll();
+}
+
+function editLink(id) {
+  const link = linksData.find(l => l.id === id);
+  link.title = prompt("Title", link.title);
+  link.path = prompt("URL Path", link.path);
+  link.redirectTo = prompt("Redirect To URL", link.redirectTo);
+  saveAll();
+}
+
+async function saveAll() {
+  const content = btoa(JSON.stringify({ links: linksData }, null, 2));
+
+  const current = await fetch(
+    `https://api.github.com/repos/${OWNER}/${REPO}/contents/${LINKS_PATH}`,
+    { headers: { Authorization: `token ${token}` } }
+  ).then(r => r.json());
+
+  await fetch(
+    `https://api.github.com/repos/${OWNER}/${REPO}/contents/${LINKS_PATH}`,
+    {
+      method: "PUT",
+      headers: {
+        Authorization: `token ${token}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        message: "Update links",
+        content,
+        sha: current.sha
+      })
+    }
+  );
+
+  alert("Saved");
+  loadLinks();
+}
+
+document.getElementById("searchInput").addEventListener("input", renderLinks);
+</script>
+</body>
+</html>
