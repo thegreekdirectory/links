@@ -11,6 +11,12 @@
       "title": "TGDL",
       "path": "1",
       "redirectTo": "https://listings.thegreekdirectory.org"
+    },
+    {
+      "id": "b74d2c43-17ef-4dc5-8f7f-2d52648ae6b6",
+      "title": "1",
+      "path": "/r/1",
+      "redirectTo": "https://google.com"
     }
   ]
 }
