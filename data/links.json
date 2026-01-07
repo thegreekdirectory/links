@@ -1,12 +1,6 @@
 {
   "links": [
     {
-      "id": "3b9f92e4-03f2-4013-9a72-b8b73dfdcb58",
-      "title": "TGD",
-      "path": "/tgd",
-      "redirectTo": "https://www.thegreekdirectory.org"
-    },
-    {
       "id": "cf8709a3-f864-42eb-9561-0d73831df26d",
       "title": "TGDL",
       "path": "1",
