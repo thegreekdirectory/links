@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>TGD Link Admin</title>
+  <title>TGD Redirect Admin</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
@@ -21,7 +21,7 @@
 
     <!-- CONTROLS -->
     <div id="controls" class="hidden mb-4 flex gap-2">
-      <input id="searchInput" placeholder="Search links..."
+      <input id="searchInput" placeholder="Search..."
         class="border p-2 flex-1">
       <button onclick="openNewLink()"
         class="bg-green-600 text-white px-4 py-2 rounded">New Link</button>
@@ -29,7 +29,7 @@
         class="bg-gray-600 text-white px-4 py-2 rounded">Refresh</button>
     </div>
 
-    <!-- LINKS LIST -->
+    <!-- LIST -->
     <div id="linksList" class="space-y-2"></div>
   </div>
 
@@ -37,25 +37,80 @@
 const OWNER = "thegreekdirectory";
 const REPO = "links";
 const LINKS_PATH = "data/links.json";
+const REDIRECT_DIR = "r";
+
 let token = "";
 let linksData = [];
 
 function login() {
-  token = document.getElementById("tokenInput").value;
+  token = document.getElementById("tokenInput").value.trim();
+  if (!token) return alert("Token required");
   document.getElementById("authBox").classList.add("hidden");
   document.getElementById("controls").classList.remove("hidden");
   loadLinks();
 }
 
-async function loadLinks() {
-  const res = await fetch(
-    `https://api.github.com/repos/${OWNER}/${REPO}/contents/${LINKS_PATH}`,
-    { headers: { Authorization: `token ${token}` } }
+/* ---------- VALIDATION ---------- */
+
+function validatePath(path) {
+  if (!path.startsWith("/r/")) {
+    alert("URL Path must start with /r/");
+    return false;
+  }
+  return true;
+}
+
+function validateRedirect(url) {
+  if (!url.startsWith("https://")) {
+    alert("Redirect URL must start with https://");
+    return false;
+  }
+  return true;
+}
+
+function pathToFile(path) {
+  const slug = path.replace("/r/", "");
+  return `${REDIRECT_DIR}/${slug}.html`;
+}
+
+/* ---------- REDIRECT HTML ---------- */
+
+function generateRedirectHTML(url) {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Redirecting…</title>
+  <meta http-equiv="refresh" content="0;url=${url}">
+  <script>
+    window.location.href = "${url}";
+  </script>
+</head>
+<body>
+  <p>Redirecting to ${url}</p>
+</body>
+</html>`;
+}
+
+/* ---------- GITHUB HELPERS ---------- */
+
+async function githubFetch(path) {
+  return fetch(
+    \`https://api.github.com/repos/${OWNER}/${REPO}/contents/${path}\`,
+    { headers: { Authorization: \`token ${token}\` } }
   );
+}
+
+/* ---------- LOAD ---------- */
+
+async function loadLinks() {
+  const res = await githubFetch(LINKS_PATH);
   const data = await res.json();
   linksData = JSON.parse(atob(data.content)).links;
   renderLinks();
 }
+
+/* ---------- RENDER ---------- */
 
 function renderLinks() {
   const q = document.getElementById("searchInput").value.toLowerCase();
@@ -70,67 +125,143 @@ function renderLinks() {
     )
     .forEach(l => {
       list.innerHTML += `
-        <div class="border p-3 rounded flex justify-between">
+        <div class="border p-3 rounded flex justify-between items-center">
           <div>
             <div class="font-semibold">${l.title}</div>
             <div class="text-sm text-gray-600">${l.path} → ${l.redirectTo}</div>
           </div>
-          <button class="text-blue-600" onclick="editLink('${l.id}')">Edit</button>
+          <div>
+            <button onclick="editLink('${l.id}')" class="text-blue-600 mr-3">Edit</button>
+            <button onclick="deleteLink('${l.id}')" class="text-red-600">Delete</button>
+          </div>
         </div>
       `;
     });
 }
 
-function openNewLink() {
+/* ---------- FILE OPS ---------- */
+
+async function upsertRedirectFile(path, redirectTo) {
+  const filePath = pathToFile(path);
+  const content = btoa(generateRedirectHTML(redirectTo));
+
+  let sha = null;
+  const check = await githubFetch(filePath);
+  if (check.ok) sha = (await check.json()).sha;
+
+  await fetch(
+    \`https://api.github.com/repos/${OWNER}/${REPO}/contents/${filePath}\`,
+    {
+      method: "PUT",
+      headers: {
+        Authorization: \`token ${token}\`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        message: "Update redirect",
+        content,
+        ...(sha && { sha })
+      })
+    }
+  );
+}
+
+async function deleteRedirectFile(path) {
+  const filePath = pathToFile(path);
+  const res = await githubFetch(filePath);
+  if (!res.ok) return;
+
+  const file = await res.json();
+
+  await fetch(
+    \`https://api.github.com/repos/${OWNER}/${REPO}/contents/${filePath}\`,
+    {
+      method: "DELETE",
+      headers: {
+        Authorization: \`token ${token}\`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        message: "Delete redirect",
+        sha: file.sha
+      })
+    }
+  );
+}
+
+/* ---------- CRUD ---------- */
+
+async function openNewLink() {
   const title = prompt("Title");
-  const path = prompt("URL Path (e.g. /a/b-1)");
-  const redirectTo = prompt("Redirect To URL");
+  const path = prompt("URL Path (must start with /r/)");
+  const redirectTo = prompt("Redirect To URL (must start with https://)");
 
   if (!title || !path || !redirectTo) return;
+  if (!validatePath(path) || !validateRedirect(redirectTo)) return;
 
-  linksData.push({
+  const link = {
     id: crypto.randomUUID(),
     title,
     path,
     redirectTo
-  });
+  };
 
-  saveAll();
+  linksData.push(link);
+  await upsertRedirectFile(path, redirectTo);
+  await saveJSON();
 }
 
-function editLink(id) {
+async function editLink(id) {
   const link = linksData.find(l => l.id === id);
+  const oldPath = link.path;
+
   link.title = prompt("Title", link.title);
   link.path = prompt("URL Path", link.path);
   link.redirectTo = prompt("Redirect To URL", link.redirectTo);
-  saveAll();
+
+  if (!validatePath(link.path) || !validateRedirect(link.redirectTo)) return;
+
+  if (oldPath !== link.path) {
+    await deleteRedirectFile(oldPath);
+  }
+
+  await upsertRedirectFile(link.path, link.redirectTo);
+  await saveJSON();
 }
 
-async function saveAll() {
-  const content = btoa(JSON.stringify({ links: linksData }, null, 2));
+async function deleteLink(id) {
+  if (!confirm("Delete this redirect?")) return;
 
-  const current = await fetch(
-    `https://api.github.com/repos/${OWNER}/${REPO}/contents/${LINKS_PATH}`,
-    { headers: { Authorization: `token ${token}` } }
-  ).then(r => r.json());
+  const index = linksData.findIndex(l => l.id === id);
+  const link = linksData[index];
+
+  await deleteRedirectFile(link.path);
+  linksData.splice(index, 1);
+  await saveJSON();
+}
+
+/* ---------- SAVE JSON ---------- */
+
+async function saveJSON() {
+  const content = btoa(JSON.stringify({ links: linksData }, null, 2));
+  const current = await githubFetch(LINKS_PATH).then(r => r.json());
 
   await fetch(
-    `https://api.github.com/repos/${OWNER}/${REPO}/contents/${LINKS_PATH}`,
+    \`https://api.github.com/repos/${OWNER}/${REPO}/contents/${LINKS_PATH}\`,
     {
       method: "PUT",
       headers: {
-        Authorization: `token ${token}`,
+        Authorization: \`token ${token}\`,
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        message: "Update links",
+        message: "Update links.json",
         content,
         sha: current.sha
       })
     }
   );
 
-  alert("Saved");
   loadLinks();
 }
 
