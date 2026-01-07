@@ -1,3 +1,10 @@
 {
-  "links": []
+  "links": [
+    {
+      "id": "0e58e5d1-4c1e-4a6f-939a-f5caf571037c",
+      "title": "TGD",
+      "path": "/r/tgd",
+      "redirectTo": "https://www.thegreekdirectory.org"
+    }
+  ]
 }
