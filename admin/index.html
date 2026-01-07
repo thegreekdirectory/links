@@ -7,60 +7,79 @@
 </head>
 
 <body class="bg-gray-100 min-h-screen p-6">
-  <div class="max-w-5xl mx-auto bg-white shadow rounded p-6">
+  <div class="max-w-6xl mx-auto bg-white shadow rounded p-6">
 
-    <h1 class="text-2xl font-bold mb-4">Redirect Links Admin</h1>
+    <h1 class="text-2xl font-bold mb-4">Redirect Admin</h1>
 
-    <!-- AUTH -->
-    <div id="authBox" class="mb-6">
-      <input id="tokenInput" type="password" placeholder="GitHub Personal Access Token"
+    <!-- LOGIN -->
+    <div id="loginBox" class="mb-6">
+      <input id="tokenInput" type="password"
+        placeholder="GitHub Personal Access Token"
         class="border p-2 w-full mb-2">
       <button onclick="login()"
-        class="bg-blue-600 text-white px-4 py-2 rounded">Login</button>
+        class="bg-blue-600 text-white px-4 py-2 rounded">
+        Login
+      </button>
     </div>
 
     <!-- CONTROLS -->
     <div id="controls" class="hidden mb-4 flex gap-2">
       <input id="searchInput" placeholder="Search..."
         class="border p-2 flex-1">
-      <button onclick="openNewLink()"
-        class="bg-green-600 text-white px-4 py-2 rounded">New Link</button>
+      <button onclick="openNew()"
+        class="bg-green-600 text-white px-4 py-2 rounded">
+        New Link
+      </button>
       <button onclick="loadLinks()"
-        class="bg-gray-600 text-white px-4 py-2 rounded">Refresh</button>
+        class="bg-gray-600 text-white px-4 py-2 rounded">
+        Refresh
+      </button>
     </div>
 
     <!-- LIST -->
-    <div id="linksList" class="space-y-2"></div>
+    <div id="list" class="space-y-2"></div>
   </div>
 
 <script>
+/* ================= CONFIG ================= */
+
 const OWNER = "thegreekdirectory";
 const REPO = "links";
-const LINKS_PATH = "data/links.json";
+const LINKS_JSON = "data/links.json";
+const TEMPLATE_PATH = "r/_template.html";
 const REDIRECT_DIR = "r";
 
 let token = "";
-let linksData = [];
+let links = [];
+
+/* ================= AUTH ================= */
 
 function login() {
-  token = document.getElementById("tokenInput").value.trim();
+  token = tokenInput.value.trim();
   if (!token) return alert("Token required");
-  document.getElementById("authBox").classList.add("hidden");
-  document.getElementById("controls").classList.remove("hidden");
+  loginBox.classList.add("hidden");
+  controls.classList.remove("hidden");
   loadLinks();
 }
 
-/* ---------- VALIDATION ---------- */
+/* ================= HELPERS ================= */
 
-function validatePath(path) {
+function gh(path) {
+  return fetch(
+    `https://api.github.com/repos/${OWNER}/${REPO}/contents/${path}`,
+    { headers: { Authorization: `token ${token}` } }
+  );
+}
+
+function requireValidPath(path) {
   if (!path.startsWith("/r/")) {
-    alert("URL Path must start with /r/");
+    alert("Path must start with /r/");
     return false;
   }
   return true;
 }
 
-function validateRedirect(url) {
+function requireValidURL(url) {
   if (!url.startsWith("https://")) {
     alert("Redirect URL must start with https://");
     return false;
@@ -68,56 +87,26 @@ function validateRedirect(url) {
   return true;
 }
 
-function pathToFile(path) {
-  const slug = path.replace("/r/", "");
-  return `${REDIRECT_DIR}/${slug}.html`;
+function slugFromPath(path) {
+  return path.replace("/r/", "");
 }
 
-/* ---------- REDIRECT HTML ---------- */
-
-function generateRedirectHTML(url) {
-  return `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Redirecting…</title>
-  <meta http-equiv="refresh" content="0;url=${url}">
-  <script>
-    window.location.href = "${url}";
-  </script>
-</head>
-<body>
-  <p>Redirecting to ${url}</p>
-</body>
-</html>`;
-}
-
-/* ---------- GITHUB HELPERS ---------- */
-
-async function githubFetch(path) {
-  return fetch(
-    \`https://api.github.com/repos/${OWNER}/${REPO}/contents/${path}\`,
-    { headers: { Authorization: \`token ${token}\` } }
-  );
-}
-
-/* ---------- LOAD ---------- */
+/* ================= LOAD ================= */
 
 async function loadLinks() {
-  const res = await githubFetch(LINKS_PATH);
-  const data = await res.json();
-  linksData = JSON.parse(atob(data.content)).links;
-  renderLinks();
+  const res = await gh(LINKS_JSON);
+  const file = await res.json();
+  links = JSON.parse(atob(file.content)).links;
+  render();
 }
 
-/* ---------- RENDER ---------- */
+/* ================= RENDER ================= */
 
-function renderLinks() {
-  const q = document.getElementById("searchInput").value.toLowerCase();
-  const list = document.getElementById("linksList");
+function render() {
+  const q = searchInput.value.toLowerCase();
   list.innerHTML = "";
 
-  linksData
+  links
     .filter(l =>
       l.title.toLowerCase().includes(q) ||
       l.path.toLowerCase().includes(q) ||
@@ -125,13 +114,15 @@ function renderLinks() {
     )
     .forEach(l => {
       list.innerHTML += `
-        <div class="border p-3 rounded flex justify-between items-center">
+        <div class="border rounded p-3 flex justify-between items-center">
           <div>
             <div class="font-semibold">${l.title}</div>
-            <div class="text-sm text-gray-600">${l.path} → ${l.redirectTo}</div>
+            <div class="text-sm text-gray-600">
+              ${l.path} → ${l.redirectTo}
+            </div>
           </div>
-          <div>
-            <button onclick="editLink('${l.id}')" class="text-blue-600 mr-3">Edit</button>
+          <div class="space-x-3">
+            <button onclick="editLink('${l.id}')" class="text-blue-600">Edit</button>
             <button onclick="deleteLink('${l.id}')" class="text-red-600">Delete</button>
           </div>
         </div>
@@ -139,26 +130,39 @@ function renderLinks() {
     });
 }
 
-/* ---------- FILE OPS ---------- */
+/* ================= TEMPLATE ================= */
 
-async function upsertRedirectFile(path, redirectTo) {
-  const filePath = pathToFile(path);
-  const content = btoa(generateRedirectHTML(redirectTo));
+async function loadTemplate() {
+  const res = await gh(TEMPLATE_PATH);
+  const file = await res.json();
+  return atob(file.content);
+}
+
+/* ================= FILE OPS ================= */
+
+async function writeRedirect(path, redirectTo) {
+  const slug = slugFromPath(path);
+  const filePath = `${REDIRECT_DIR}/${slug}.html`;
+
+  let html = await loadTemplate();
+  html = html.replaceAll("{{REDIRECT_URL}}", redirectTo);
+
+  const content = btoa(html);
 
   let sha = null;
-  const check = await githubFetch(filePath);
+  const check = await gh(filePath);
   if (check.ok) sha = (await check.json()).sha;
 
   await fetch(
-    \`https://api.github.com/repos/${OWNER}/${REPO}/contents/${filePath}\`,
+    `https://api.github.com/repos/${OWNER}/${REPO}/contents/${filePath}`,
     {
       method: "PUT",
       headers: {
-        Authorization: \`token ${token}\`,
+        Authorization: `token ${token}`,
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        message: "Update redirect",
+        message: "Write redirect page",
         content,
         ...(sha && { sha })
       })
@@ -166,38 +170,65 @@ async function upsertRedirectFile(path, redirectTo) {
   );
 }
 
-async function deleteRedirectFile(path) {
-  const filePath = pathToFile(path);
-  const res = await githubFetch(filePath);
+async function removeRedirect(path) {
+  const slug = slugFromPath(path);
+  const filePath = `${REDIRECT_DIR}/${slug}.html`;
+
+  const res = await gh(filePath);
   if (!res.ok) return;
 
   const file = await res.json();
 
   await fetch(
-    \`https://api.github.com/repos/${OWNER}/${REPO}/contents/${filePath}\`,
+    `https://api.github.com/repos/${OWNER}/${REPO}/contents/${filePath}`,
     {
       method: "DELETE",
       headers: {
-        Authorization: \`token ${token}\`,
+        Authorization: `token ${token}`,
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        message: "Delete redirect",
+        message: "Delete redirect page",
         sha: file.sha
       })
     }
   );
 }
 
-/* ---------- CRUD ---------- */
+/* ================= SAVE JSON ================= */
 
-async function openNewLink() {
+async function saveJSON() {
+  const res = await gh(LINKS_JSON);
+  const file = await res.json();
+
+  await fetch(
+    `https://api.github.com/repos/${OWNER}/${REPO}/contents/${LINKS_JSON}`,
+    {
+      method: "PUT",
+      headers: {
+        Authorization: `token ${token}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        message: "Update links.json",
+        content: btoa(JSON.stringify({ links }, null, 2)),
+        sha: file.sha
+      })
+    }
+  );
+
+  loadLinks();
+}
+
+/* ================= CRUD ================= */
+
+async function openNew() {
   const title = prompt("Title");
-  const path = prompt("URL Path (must start with /r/)");
-  const redirectTo = prompt("Redirect To URL (must start with https://)");
+  const path = prompt("Path (must start with /r/)");
+  const redirectTo = prompt("Redirect URL (https://...)");
 
   if (!title || !path || !redirectTo) return;
-  if (!validatePath(path) || !validateRedirect(redirectTo)) return;
+  if (!requireValidPath(path) || !requireValidURL(redirectTo)) return;
 
   const link = {
     id: crypto.randomUUID(),
@@ -206,66 +237,44 @@ async function openNewLink() {
     redirectTo
   };
 
-  linksData.push(link);
-  await upsertRedirectFile(path, redirectTo);
+  links.push(link);
+  await writeRedirect(path, redirectTo);
   await saveJSON();
 }
 
 async function editLink(id) {
-  const link = linksData.find(l => l.id === id);
+  const link = links.find(l => l.id === id);
   const oldPath = link.path;
 
   link.title = prompt("Title", link.title);
-  link.path = prompt("URL Path", link.path);
-  link.redirectTo = prompt("Redirect To URL", link.redirectTo);
+  link.path = prompt("Path", link.path);
+  link.redirectTo = prompt("Redirect URL", link.redirectTo);
 
-  if (!validatePath(link.path) || !validateRedirect(link.redirectTo)) return;
+  if (!requireValidPath(link.path) || !requireValidURL(link.redirectTo)) return;
 
   if (oldPath !== link.path) {
-    await deleteRedirectFile(oldPath);
+    await removeRedirect(oldPath);
   }
 
-  await upsertRedirectFile(link.path, link.redirectTo);
+  await writeRedirect(link.path, link.redirectTo);
   await saveJSON();
 }
 
 async function deleteLink(id) {
   if (!confirm("Delete this redirect?")) return;
 
-  const index = linksData.findIndex(l => l.id === id);
-  const link = linksData[index];
+  const index = links.findIndex(l => l.id === id);
+  const link = links[index];
 
-  await deleteRedirectFile(link.path);
-  linksData.splice(index, 1);
+  await removeRedirect(link.path);
+  links.splice(index, 1);
   await saveJSON();
 }
 
-/* ---------- SAVE JSON ---------- */
+/* ================= EVENTS ================= */
 
-async function saveJSON() {
-  const content = btoa(JSON.stringify({ links: linksData }, null, 2));
-  const current = await githubFetch(LINKS_PATH).then(r => r.json());
-
-  await fetch(
-    \`https://api.github.com/repos/${OWNER}/${REPO}/contents/${LINKS_PATH}\`,
-    {
-      method: "PUT",
-      headers: {
-        Authorization: \`token ${token}\`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        message: "Update links.json",
-        content,
-        sha: current.sha
-      })
-    }
-  );
-
-  loadLinks();
-}
-
-document.getElementById("searchInput").addEventListener("input", renderLinks);
+searchInput.addEventListener("input", render);
 </script>
+
 </body>
 </html>
