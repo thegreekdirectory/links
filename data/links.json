@@ -5,6 +5,12 @@
       "title": "TGD",
       "path": "/tgd",
       "redirectTo": "https://www.thegreekdirectory.org"
+    },
+    {
+      "id": "cf8709a3-f864-42eb-9561-0d73831df26d",
+      "title": "TGDL",
+      "path": "1",
+      "redirectTo": "https://listings.thegreekdirectory.org"
     }
   ]
 }
