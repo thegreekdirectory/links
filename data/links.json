@@ -5,6 +5,12 @@
       "title": "TGD",
       "path": "/r/tgd",
       "redirectTo": "https://www.thegreekdirectory.org"
+    },
+    {
+      "id": "e9aff0f8-2ca0-413a-acea-c0124baaa88a",
+      "title": "ER",
+      "path": "/r/eagle",
+      "redirectTo": "https://eagledg.com"
     }
   ]
 }
