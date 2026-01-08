@@ -17,6 +17,18 @@
       "title": "Google",
       "path": "/r/g",
       "redirectTo": "https://google.com"
+    },
+    {
+      "id": "f6e3e3b6-fb03-44fe-9c17-44ffb4fc0d32",
+      "title": "Listing #1",
+      "path": "/r/l/1",
+      "redirectTo": "https://thegreekdirectory.org/listings/professional-business-services/e"
+    },
+    {
+      "id": "f589e7d9-5e54-4ceb-a23d-cf47078b5401",
+      "title": "Portal #1",
+      "path": "/r/b/1",
+      "redirectTo": "https://thegreekdirectory.org/business-portal.html?slug=e"
     }
   ]
 }
