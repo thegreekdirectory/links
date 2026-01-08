@@ -11,6 +11,12 @@
       "title": "ER",
       "path": "/r/eagle",
       "redirectTo": "https://eagledg.com"
+    },
+    {
+      "id": "d338abe3-818d-4837-90e1-fc0bd019b09c",
+      "title": "Google",
+      "path": "/r/g",
+      "redirectTo": "https://google.com"
     }
   ]
 }
