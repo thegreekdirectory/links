@@ -29,6 +29,18 @@
       "title": "Portal #1",
       "path": "/r/b/1",
       "redirectTo": "https://thegreekdirectory.org/business-portal.html?slug=e"
+    },
+    {
+      "id": "eecbd47b-eb2a-47b9-a799-84d4b7a8e67f",
+      "title": "Listing #2",
+      "path": "/r/l/2",
+      "redirectTo": "https://thegreekdirectory.org/listings/home-construction/business"
+    },
+    {
+      "id": "8b3324c8-c611-4a98-87c3-97e60f33b900",
+      "title": "Portal #2",
+      "path": "/r/b/2",
+      "redirectTo": "https://thegreekdirectory.org/business-portal.html?slug=business"
     }
   ]
 }
