@@ -41,6 +41,18 @@
       "title": "Portal #2",
       "path": "/r/b/2",
       "redirectTo": "https://thegreekdirectory.org/business-portal.html?slug=business"
+    },
+    {
+      "id": "46660fe0-6d0a-4251-bc0e-8127fa0aca73",
+      "title": "Listing #4",
+      "path": "/r/l/4",
+      "redirectTo": "https://thegreekdirectory.org/listings/grocery-imports/q"
+    },
+    {
+      "id": "14fe1258-88e2-4092-acd6-b8d04add5574",
+      "title": "Portal #4",
+      "path": "/r/b/4",
+      "redirectTo": "https://thegreekdirectory.org/business-portal.html?slug=q"
     }
   ]
 }
