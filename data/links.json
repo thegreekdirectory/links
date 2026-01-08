@@ -65,6 +65,18 @@
       "title": "Portal #undefined",
       "path": "/r/b/undefined",
       "redirectTo": "https://thegreekdirectory.org/business-portal.html?slug=eagle-restaurant"
+    },
+    {
+      "id": "68b63095-8528-4ff5-abea-36d438c5bd97",
+      "title": "Listing #5",
+      "path": "/r/l/5",
+      "redirectTo": "https://thegreekdirectory.org/listings/grocery-imports/g"
+    },
+    {
+      "id": "9d2bcce6-bd5e-4134-956f-41a98fae5ddc",
+      "title": "Portal #5",
+      "path": "/r/b/5",
+      "redirectTo": "https://thegreekdirectory.org/business-portal.html?slug=g"
     }
   ]
 }
