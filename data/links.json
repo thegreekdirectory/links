@@ -53,6 +53,18 @@
       "title": "Portal #4",
       "path": "/r/b/4",
       "redirectTo": "https://thegreekdirectory.org/business-portal.html?slug=q"
+    },
+    {
+      "id": "486947c6-29f0-4c70-8213-b051bd8665f3",
+      "title": "Listing #undefined",
+      "path": "/r/l/undefined",
+      "redirectTo": "https://thegreekdirectory.org/listings/food-hospitality/eagle-restaurant"
+    },
+    {
+      "id": "99c48e2b-aa79-4550-a405-4c72952c9e24",
+      "title": "Portal #undefined",
+      "path": "/r/b/undefined",
+      "redirectTo": "https://thegreekdirectory.org/business-portal.html?slug=eagle-restaurant"
     }
   ]
 }
