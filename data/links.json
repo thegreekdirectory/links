@@ -101,6 +101,12 @@
       "title": "FILTERS: Categories - Food & Hospitality",
       "path": "/r/c/7",
       "redirectTo": "https://www.thegreekdirectory.org/listings?category=Food+%26+Hospitality"
+    },
+    {
+      "id": "b5666993-23d0-4986-b544-f133ec216380",
+      "title": "FILTERS: Categories - Grocery & Imports",
+      "path": "/r/c/8",
+      "redirectTo": "https://www.thegreekdirectory.org/listings?category=Grocery+%26+Imports"
     }
   ]
 }
