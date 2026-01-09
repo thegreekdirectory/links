@@ -119,6 +119,12 @@
       "title": "FILTERS: Categories - Home & Construction",
       "path": "/r/c/9",
       "redirectTo": "https://www.thegreekdirectory.org/listings?category=Home+%26+Construction"
+    },
+    {
+      "id": "6919c5bf-7079-49d5-a68c-d31002604373",
+      "title": "Business Portal",
+      "path": "/r/b",
+      "redirectTo": "https://listings.thegreekdirectory.org/business-portal"
     }
   ]
 }
