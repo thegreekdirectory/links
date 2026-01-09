@@ -83,6 +83,12 @@
       "title": "FILTERS: Categories - Church & Religious Organization",
       "path": "/r/c/3",
       "redirectTo": "https://www.thegreekdirectory.org/listings?category=Church+%26+Religious+Organization"
+    },
+    {
+      "id": "6471e766-2df4-48a0-8f1b-69a0fec702c8",
+      "title": "FILTERS: Categories - Cultural/Fraternal Organization",
+      "path": "/r/c/4",
+      "redirectTo": "https://www.thegreekdirectory.org/listings?category=Cultural%2FFraternal+Organization"
     }
   ]
 }
