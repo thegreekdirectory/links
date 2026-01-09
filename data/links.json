@@ -113,6 +113,12 @@
       "title": "FILTERS: Categories - Education & Community",
       "path": "/r/c/5",
       "redirectTo": "https://www.thegreekdirectory.org/listings?category=Education+%26+Community"
+    },
+    {
+      "id": "fec7fead-fe18-4139-9242-2854d9995d1a",
+      "title": "FILTERS: Categories - Home & Construction",
+      "path": "/r/c/9",
+      "redirectTo": "https://www.thegreekdirectory.org/listings?category=Home+%26+Construction"
     }
   ]
 }
