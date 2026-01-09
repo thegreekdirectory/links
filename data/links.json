@@ -95,6 +95,12 @@
       "title": "FILTERS: Categories - Entertainment, Arts & Recreation",
       "path": "/r/c/6",
       "redirectTo": "https://www.thegreekdirectory.org/listings?category=Entertainment%2C+Arts+%26+Recreation"
+    },
+    {
+      "id": "3262be41-e246-4d4a-90f4-b21dfc615cc5",
+      "title": "FILTERS: Category - Food & Hospitality",
+      "path": "/r/c/7",
+      "redirectTo": "https://www.thegreekdirectory.org/listings?category=Food+%26+Hospitality"
     }
   ]
 }
