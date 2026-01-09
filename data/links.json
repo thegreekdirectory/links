@@ -65,6 +65,18 @@
       "title": "Portal #5",
       "path": "/r/b/5",
       "redirectTo": "https://thegreekdirectory.org/business-portal.html?slug=g"
+    },
+    {
+      "id": "5489d898-0f02-42ef-b7fe-4d178d9374e6",
+      "title": "FILTERS: Categories - Automotive & Transportation",
+      "path": "/r/c/1",
+      "redirectTo": "https://www.thegreekdirectory.org/listings?category=Automotive+%26+Transportation"
+    },
+    {
+      "id": "0621d711-8eb3-433f-941c-5d70ff0a6ad8",
+      "title": "FILTERS: Categories - Beauty & Health",
+      "path": "/r/c/2",
+      "redirectTo": "https://www.thegreekdirectory.org/listings?category=Beauty+%26+Health"
     }
   ]
 }
