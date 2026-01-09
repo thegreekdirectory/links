@@ -89,6 +89,12 @@
       "title": "FILTERS: Categories - Cultural/Fraternal Organization",
       "path": "/r/c/4",
       "redirectTo": "https://www.thegreekdirectory.org/listings?category=Cultural%2FFraternal+Organization"
+    },
+    {
+      "id": "ebf47ffd-1f54-4b58-afa8-bee321b81b10",
+      "title": "FILTERS: Categories - Entertainment, Arts & Recreation",
+      "path": "/r/c/6",
+      "redirectTo": "https://www.thegreekdirectory.org/listings?category=Entertainment%2C+Arts+%26+Recreation"
     }
   ]
 }
