@@ -107,6 +107,12 @@
       "title": "FILTERS: Categories - Grocery & Imports",
       "path": "/r/c/8",
       "redirectTo": "https://www.thegreekdirectory.org/listings?category=Grocery+%26+Imports"
+    },
+    {
+      "id": "1d4c4e19-db74-4e3e-a5b7-5a70385b93ef",
+      "title": "FILTERS: Categories - Education & Community",
+      "path": "/r/c/5",
+      "redirectTo": "https://www.thegreekdirectory.org/listings?category=Education+%26+Community"
     }
   ]
 }
