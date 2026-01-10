@@ -58,13 +58,13 @@
       "id": "68b63095-8528-4ff5-abea-36d438c5bd97",
       "title": "Listing #5",
       "path": "/r/l/5",
-      "redirectTo": "https://thegreekdirectory.org/listings/pets-veterinary/v"
+      "redirectTo": "https://thegreekdirectory.org/listings/grocery-imports/g"
     },
     {
       "id": "9d2bcce6-bd5e-4134-956f-41a98fae5ddc",
       "title": "Portal #5",
       "path": "/r/b/5",
-      "redirectTo": "https://thegreekdirectory.org/business.html?slug=v"
+      "redirectTo": "https://thegreekdirectory.org/business-portal.html?slug=g"
     },
     {
       "id": "5489d898-0f02-42ef-b7fe-4d178d9374e6",
@@ -121,10 +121,16 @@
       "redirectTo": "https://www.thegreekdirectory.org/listings?category=Home+%26+Construction"
     },
     {
-      "id": "6919c5bf-7079-49d5-a68c-d31002604373",
-      "title": "Business Portal",
-      "path": "/r/b",
-      "redirectTo": "https://listings.thegreekdirectory.org/business-portal"
+      "id": "706831be-9fae-4e74-937d-dea6babaf4c0",
+      "title": "FILTERS: Categories - Industrial & Manufacturing",
+      "path": "/r/c/10",
+      "redirectTo": "https://www.thegreekdirectory.org/listings?category=Industrial+%26+Manufacturing"
+    },
+    {
+      "id": "30236a14-c764-4749-adb9-dd27b8469829",
+      "title": "FILTERS: Categories - Pets & Veterinary",
+      "path": "/r/c/11",
+      "redirectTo": "https://www.thegreekdirectory.org/listings?category=Pets+%26+Veterinary"
     }
   ]
 }
