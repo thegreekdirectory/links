@@ -131,6 +131,18 @@
       "title": "FILTERS: Categories - Pets & Veterinary",
       "path": "/r/c/11",
       "redirectTo": "https://www.thegreekdirectory.org/listings?category=Pets+%26+Veterinary"
+    },
+    {
+      "id": "b2b083c8-076d-46bb-a438-df2c073fcb1e",
+      "title": "FILTERS: Categories - Professional & Business Services",
+      "path": "/r/c/12",
+      "redirectTo": "https://www.thegreekdirectory.org/listings?category=Professional+%26+Business+Services"
+    },
+    {
+      "id": "21d08287-c7d4-4aeb-b177-f9c4f08c7389",
+      "title": "FILTERS: Categories - Real Estate & Development",
+      "path": "/r/c/13",
+      "redirectTo": "https://www.thegreekdirectory.org/listings?category=Real+Estate+%26+Development"
     }
   ]
 }
