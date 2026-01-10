@@ -143,6 +143,12 @@
       "title": "FILTERS: Categories - Real Estate & Development",
       "path": "/r/c/13",
       "redirectTo": "https://www.thegreekdirectory.org/listings?category=Real+Estate+%26+Development"
+    },
+    {
+      "id": "e48585f8-e5ee-4d00-a571-ba10d204d037",
+      "title": "FILTERS: Categories - Retail & Shopping",
+      "path": "/r/c/14",
+      "redirectTo": "https://www.thegreekdirectory.org/listings?category=Retail+%26+Shopping"
     }
   ]
 }
