@@ -149,6 +149,18 @@
       "title": "FILTERS: Categories - Retail & Shopping",
       "path": "/r/c/14",
       "redirectTo": "https://www.thegreekdirectory.org/listings?category=Retail+%26+Shopping"
+    },
+    {
+      "id": "13b76f98-c4e2-4b22-80c5-d09c4030278d",
+      "title": "Listing #1",
+      "path": "/l/1",
+      "redirectTo": "https://listings.thegreekdirectory.org/listings/automotive-transportation/a"
+    },
+    {
+      "id": "ec7ec362-c1b5-4eaa-836a-26e11fb39d18",
+      "title": "Portal #1",
+      "path": "/b/1",
+      "redirectTo": "https://listings.thegreekdirectory.org/business.html?slug=a"
     }
   ]
 }
