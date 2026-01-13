@@ -173,6 +173,18 @@
       "title": "Portal #undefined",
       "path": "/b/undefined",
       "redirectTo": "https://listings.thegreekdirectory.org/business.html?slug=eagle-restaurant"
+    },
+    {
+      "id": "f092748b-3d42-4c7e-a715-ff3b03622e15",
+      "title": "Listing #2",
+      "path": "/l/2",
+      "redirectTo": "https://listings.thegreekdirectory.org/listings/home-construction/b"
+    },
+    {
+      "id": "652e979a-3b8a-42af-937c-84822d1cc1e9",
+      "title": "Portal #2",
+      "path": "/b/2",
+      "redirectTo": "https://listings.thegreekdirectory.org/business.html?slug=b"
     }
   ]
 }
