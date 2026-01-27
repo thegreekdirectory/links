@@ -197,6 +197,12 @@
       "title": "Portal #3",
       "path": "/b/3",
       "redirectTo": "https://listings.thegreekdirectory.org/business.html?slug=c"
+    },
+    {
+      "id": "82a7d2d2-b0fb-465c-88e0-3f724d3dd89d",
+      "title": "Temp",
+      "path": "/r/temp",
+      "redirectTo": "https://listings.thegreekdirectory.org"
     }
   ]
 }
