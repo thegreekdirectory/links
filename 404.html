@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>404 - The Greek Directory</title>
+  <meta name="viewport" content="width=device-width, initial-scale
+  <!-- Favicon -->
+  <link rel="icon" href="https://static.thegreekdirectory.org/img/logo/bluefavicon.png" sizes="32x32">
+  <link rel="apple-touch-icon" href="https://social.thegreekdirectory.org/Logo2.png">
+
+  <!-- Google Font: Bitter -->
+  <link href="https://fonts.googleapis.com/css2?family=Bitter:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Bitter', serif;
+    }
+
+    body {
+      margin: 0;
+      background: linear-gradient(135deg, #055193, #033b6d);
+      color: #212121FF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .container {
+      background: white;
+      padding: 3rem 2.5rem;
+      border-radius: 20px;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+      text-align: center;
+      max-width: 420px;
+      width: 90%;
+    }
+
+    .logo {
+      width: 120px;
+      margin-bottom: 1.5rem;
+    }
+
+    h1 {
+      font-size: 3.5rem;
+      margin: 0;
+      color: #212121FF;
+    }
+
+    p {
+      font-size: 1.1rem;
+      margin: 1rem 0 2rem;
+      color: #212121FF;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .buttons a,
+    .buttons button {
+      padding: 0.7rem 1.5rem;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      font-size: 1rem;
+      font-weight: 500;
+      background: #055193;
+      color: white;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    }
+
+    .buttons a:hover,
+    .buttons button:hover {
+      background: #04467f;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+    }
+    
+    /* Dark mode */
+    @media (prefers-color-scheme: dark) {
+      body {
+        background: linear-gradient(135deg, #1a3a5a, #0d2540);
+      }
+      
+      .container {
+        background: #2a2a2a;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.8);
+      }
+      
+      h1, p {
+        color: #e5e5e5;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <img src="https://static.thegreekdirectory.org/img/logo/blue.png" alt="The Greek Directory Logo" class="logo">
+
+    <h1>404</h1>
+    <p>Sorry — the page you're looking for doesn't exist. Check the URL and try again.</p>
+
+    <div class="buttons">
+      <button onclick="history.back()">Go Back</button>
+      <a href="https://thegreekdirectory.org">Go to Home</a>
+    </div>
+  </div>
+</body>
+</html>
