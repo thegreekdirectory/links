@@ -1,208 +1,88 @@
 {
   "links": [
     {
-      "id": "0e58e5d1-4c1e-4a6f-939a-f5caf571037c",
-      "title": "TGD",
-      "path": "/r/tgd",
-      "redirectTo": "https://www.thegreekdirectory.org"
-    },
-    {
-      "id": "f6e3e3b6-fb03-44fe-9c17-44ffb4fc0d32",
-      "title": "Listing #1",
-      "path": "/r/l/1",
-      "redirectTo": "https://listings.thegreekdirectory.org/listings/automotive-transportation/a"
-    },
-    {
-      "id": "f589e7d9-5e54-4ceb-a23d-cf47078b5401",
-      "title": "Portal #1",
-      "path": "/r/b/1",
-      "redirectTo": "https://listings.thegreekdirectory.org/business.html?slug=a"
-    },
-    {
-      "id": "eecbd47b-eb2a-47b9-a799-84d4b7a8e67f",
-      "title": "Listing #2",
-      "path": "/r/l/2",
-      "redirectTo": "https://thegreekdirectory.org/listings/home-construction/business"
-    },
-    {
-      "id": "8b3324c8-c611-4a98-87c3-97e60f33b900",
-      "title": "Portal #2",
-      "path": "/r/b/2",
-      "redirectTo": "https://thegreekdirectory.org/business-portal.html?slug=business"
-    },
-    {
-      "id": "46660fe0-6d0a-4251-bc0e-8127fa0aca73",
-      "title": "Listing #4",
-      "path": "/r/l/4",
-      "redirectTo": "https://thegreekdirectory.org/listings/grocery-imports/q"
-    },
-    {
-      "id": "14fe1258-88e2-4092-acd6-b8d04add5574",
-      "title": "Portal #4",
-      "path": "/r/b/4",
-      "redirectTo": "https://thegreekdirectory.org/business-portal.html?slug=q"
-    },
-    {
-      "id": "486947c6-29f0-4c70-8213-b051bd8665f3",
-      "title": "Listing #undefined",
-      "path": "/r/l/undefined",
-      "redirectTo": "https://listings.thegreekdirectory.org/listings/education-community/hellenic-american-academy"
-    },
-    {
-      "id": "99c48e2b-aa79-4550-a405-4c72952c9e24",
-      "title": "Portal #undefined",
-      "path": "/r/b/undefined",
-      "redirectTo": "https://listings.thegreekdirectory.org/business.html?slug=hellenic-american-academy"
-    },
-    {
-      "id": "68b63095-8528-4ff5-abea-36d438c5bd97",
-      "title": "Listing #5",
-      "path": "/r/l/5",
-      "redirectTo": "https://thegreekdirectory.org/listings/grocery-imports/g"
-    },
-    {
-      "id": "9d2bcce6-bd5e-4134-956f-41a98fae5ddc",
-      "title": "Portal #5",
-      "path": "/r/b/5",
-      "redirectTo": "https://thegreekdirectory.org/business-portal.html?slug=g"
-    },
-    {
       "id": "5489d898-0f02-42ef-b7fe-4d178d9374e6",
       "title": "FILTERS: Categories - Automotive & Transportation",
-      "path": "/r/c/1",
+      "path": "/c/1",
       "redirectTo": "https://www.thegreekdirectory.org/listings?category=Automotive+%26+Transportation"
     },
     {
       "id": "0621d711-8eb3-433f-941c-5d70ff0a6ad8",
       "title": "FILTERS: Categories - Beauty & Health",
-      "path": "/r/c/2",
+      "path": "/c/2",
       "redirectTo": "https://www.thegreekdirectory.org/listings?category=Beauty+%26+Health"
     },
     {
       "id": "5e50831f-45f4-4c58-b334-14f59b6d5551",
       "title": "FILTERS: Categories - Church & Religious Organization",
-      "path": "/r/c/3",
+      "path": "/c/3",
       "redirectTo": "https://www.thegreekdirectory.org/listings?category=Church+%26+Religious+Organization"
     },
     {
       "id": "6471e766-2df4-48a0-8f1b-69a0fec702c8",
       "title": "FILTERS: Categories - Cultural/Fraternal Organization",
-      "path": "/r/c/4",
+      "path": "/c/4",
       "redirectTo": "https://www.thegreekdirectory.org/listings?category=Cultural%2FFraternal+Organization"
     },
     {
       "id": "ebf47ffd-1f54-4b58-afa8-bee321b81b10",
       "title": "FILTERS: Categories - Entertainment, Arts & Recreation",
-      "path": "/r/c/6",
+      "path": "/c/6",
       "redirectTo": "https://www.thegreekdirectory.org/listings?category=Entertainment%2C+Arts+%26+Recreation"
     },
     {
       "id": "3262be41-e246-4d4a-90f4-b21dfc615cc5",
       "title": "FILTERS: Categories - Food & Hospitality",
-      "path": "/r/c/7",
+      "path": "/c/7",
       "redirectTo": "https://www.thegreekdirectory.org/listings?category=Food+%26+Hospitality"
     },
     {
       "id": "b5666993-23d0-4986-b544-f133ec216380",
       "title": "FILTERS: Categories - Grocery & Imports",
-      "path": "/r/c/8",
+      "path": "/c/8",
       "redirectTo": "https://www.thegreekdirectory.org/listings?category=Grocery+%26+Imports"
     },
     {
       "id": "1d4c4e19-db74-4e3e-a5b7-5a70385b93ef",
       "title": "FILTERS: Categories - Education & Community",
-      "path": "/r/c/5",
+      "path": "/c/5",
       "redirectTo": "https://www.thegreekdirectory.org/listings?category=Education+%26+Community"
     },
     {
       "id": "fec7fead-fe18-4139-9242-2854d9995d1a",
       "title": "FILTERS: Categories - Home & Construction",
-      "path": "/r/c/9",
+      "path": "/c/9",
       "redirectTo": "https://www.thegreekdirectory.org/listings?category=Home+%26+Construction"
     },
     {
       "id": "706831be-9fae-4e74-937d-dea6babaf4c0",
       "title": "FILTERS: Categories - Industrial & Manufacturing",
-      "path": "/r/c/10",
+      "path": "/c/10",
       "redirectTo": "https://www.thegreekdirectory.org/listings?category=Industrial+%26+Manufacturing"
     },
     {
       "id": "30236a14-c764-4749-adb9-dd27b8469829",
       "title": "FILTERS: Categories - Pets & Veterinary",
-      "path": "/r/c/11",
+      "path": "/c/11",
       "redirectTo": "https://www.thegreekdirectory.org/listings?category=Pets+%26+Veterinary"
     },
     {
       "id": "b2b083c8-076d-46bb-a438-df2c073fcb1e",
       "title": "FILTERS: Categories - Professional & Business Services",
-      "path": "/r/c/12",
+      "path": "/c/12",
       "redirectTo": "https://www.thegreekdirectory.org/listings?category=Professional+%26+Business+Services"
     },
     {
       "id": "21d08287-c7d4-4aeb-b177-f9c4f08c7389",
       "title": "FILTERS: Categories - Real Estate & Development",
-      "path": "/r/c/13",
+      "path": "/c/13",
       "redirectTo": "https://www.thegreekdirectory.org/listings?category=Real+Estate+%26+Development"
     },
     {
       "id": "e48585f8-e5ee-4d00-a571-ba10d204d037",
       "title": "FILTERS: Categories - Retail & Shopping",
-      "path": "/r/c/14",
+      "path": "/c/14",
       "redirectTo": "https://www.thegreekdirectory.org/listings?category=Retail+%26+Shopping"
-    },
-    {
-      "id": "13b76f98-c4e2-4b22-80c5-d09c4030278d",
-      "title": "Listing #1",
-      "path": "/l/1",
-      "redirectTo": "https://listings.thegreekdirectory.org/listings/automotive-transportation/a"
-    },
-    {
-      "id": "ec7ec362-c1b5-4eaa-836a-26e11fb39d18",
-      "title": "Portal #1",
-      "path": "/b/1",
-      "redirectTo": "https://listings.thegreekdirectory.org/business.html?slug=a"
-    },
-    {
-      "id": "878a331b-f228-4d8f-b159-da84be6db8b6",
-      "title": "Listing #undefined",
-      "path": "/l/undefined",
-      "redirectTo": "https://listings.thegreekdirectory.org/listings/food-hospitality/eagle-restaurant"
-    },
-    {
-      "id": "99c83059-cdf1-4100-be3e-1ecf04b61b12",
-      "title": "Portal #undefined",
-      "path": "/b/undefined",
-      "redirectTo": "https://listings.thegreekdirectory.org/business.html?slug=eagle-restaurant"
-    },
-    {
-      "id": "f092748b-3d42-4c7e-a715-ff3b03622e15",
-      "title": "Listing #2",
-      "path": "/l/2",
-      "redirectTo": "https://listings.thegreekdirectory.org/listings/home-construction/b"
-    },
-    {
-      "id": "652e979a-3b8a-42af-937c-84822d1cc1e9",
-      "title": "Portal #2",
-      "path": "/b/2",
-      "redirectTo": "https://listings.thegreekdirectory.org/business.html?slug=b"
-    },
-    {
-      "id": "2fc7ae09-7bb7-4c66-b629-366b2315aaa6",
-      "title": "Listing #3",
-      "path": "/l/3",
-      "redirectTo": "https://listings.thegreekdirectory.org/listings/cultural-fraternal-organization/c"
-    },
-    {
-      "id": "9ee13baf-43d0-4117-a40a-8888ebee1012",
-      "title": "Portal #3",
-      "path": "/b/3",
-      "redirectTo": "https://listings.thegreekdirectory.org/business.html?slug=c"
-    },
-    {
-      "id": "82a7d2d2-b0fb-465c-88e0-3f724d3dd89d",
-      "title": "Temp",
-      "path": "/r/temp",
-      "redirectTo": "https://listings.thegreekdirectory.org"
     }
   ]
 }
