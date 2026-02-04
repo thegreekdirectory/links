@@ -83,6 +83,18 @@
       "title": "FILTERS: Categories - Retail & Shopping",
       "path": "/c/14",
       "redirectTo": "https://www.thegreekdirectory.org/listings?category=Retail+%26+Shopping"
+    },
+    {
+      "id": "8b9f408e-24e4-40ca-b4a3-3a45feabcf8d",
+      "title": "Google",
+      "path": "/google",
+      "redirectTo": "https://google.com"
+    },
+    {
+      "id": "56d8e7d1-7e2a-43a3-9de2-6898973a18e8",
+      "title": "Docs",
+      "path": "/docs/api",
+      "redirectTo": "https://docs.example.com/api"
     }
   ]
 }
