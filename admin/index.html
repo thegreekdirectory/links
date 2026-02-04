@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>TGD Redirect Admin</title>
+  <title>Redirect Admin</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
@@ -23,13 +23,23 @@
     </div>
 
     <!-- CONTROLS -->
-    <div id="controls" class="hidden mb-4 flex gap-2">
+    <div id="controls" class="hidden mb-4 flex gap-2 items-center">
       <input id="searchInput" placeholder="Search..."
         class="border p-2 flex-1">
+
+      <input type="file" id="csvInput" accept=".csv"
+        class="border p-2">
+
+      <button onclick="importCSV()"
+        class="bg-purple-600 text-white px-4 py-2 rounded">
+        Import CSV
+      </button>
+
       <button onclick="openNew()"
         class="bg-green-600 text-white px-4 py-2 rounded">
         New Link
       </button>
+
       <button onclick="loadLinks()"
         class="bg-gray-600 text-white px-4 py-2 rounded">
         Refresh
@@ -46,8 +56,8 @@
 const OWNER = "thegreekdirectory";
 const REPO = "links";
 const LINKS_JSON = "data/links.json";
-const TEMPLATE_PATH = "r/_template.html";
-const REDIRECT_DIR = "r";
+const TEMPLATE_PATH = "_template.html";
+const REDIRECT_DIR = ""; // root
 
 let token = "";
 let links = [];
@@ -72,8 +82,8 @@ function gh(path) {
 }
 
 function requireValidPath(path) {
-  if (!path.startsWith("/r/")) {
-    alert("Path must start with /r/");
+  if (!path.startsWith("/")) {
+    alert("Path must start with /");
     return false;
   }
   return true;
@@ -87,8 +97,8 @@ function requireValidURL(url) {
   return true;
 }
 
-function slugFromPath(path) {
-  return path.replace("/r/", "");
+function filePathFromPath(path) {
+  return path.replace(/^\//, "") + ".html";
 }
 
 /* ================= LOAD ================= */
@@ -141,9 +151,7 @@ async function loadTemplate() {
 /* ================= FILE OPS ================= */
 
 async function writeRedirect(path, redirectTo) {
-  const slug = slugFromPath(path);
-  const filePath = `${REDIRECT_DIR}/${slug}.html`;
-
+  const filePath = filePathFromPath(path);
   let html = await loadTemplate();
   html = html.replaceAll("{{REDIRECT_URL}}", redirectTo);
 
@@ -171,12 +179,9 @@ async function writeRedirect(path, redirectTo) {
 }
 
 async function removeRedirect(path) {
-  const slug = slugFromPath(path);
-  const filePath = `${REDIRECT_DIR}/${slug}.html`;
-
+  const filePath = filePathFromPath(path);
   const res = await gh(filePath);
   if (!res.ok) return;
-
   const file = await res.json();
 
   await fetch(
@@ -224,7 +229,7 @@ async function saveJSON() {
 
 async function openNew() {
   const title = prompt("Title");
-  const path = prompt("Path (must start with /r/)");
+  const path = prompt("Path (/anything)");
   const redirectTo = prompt("Redirect URL (https://...)");
 
   if (!title || !path || !redirectTo) return;
@@ -269,6 +274,35 @@ async function deleteLink(id) {
   await removeRedirect(link.path);
   links.splice(index, 1);
   await saveJSON();
+}
+
+/* ================= CSV IMPORT ================= */
+
+async function importCSV() {
+  const file = csvInput.files[0];
+  if (!file) return alert("Select a CSV first");
+
+  const text = await file.text();
+  const rows = text.trim().split("\n").slice(1);
+
+  for (const row of rows) {
+    const [title, path, redirectTo] = row.split(",");
+
+    if (!title || !path || !redirectTo) continue;
+    if (!requireValidPath(path) || !requireValidURL(redirectTo)) continue;
+
+    links.push({
+      id: crypto.randomUUID(),
+      title: title.trim(),
+      path: path.trim(),
+      redirectTo: redirectTo.trim()
+    });
+
+    await writeRedirect(path.trim(), redirectTo.trim());
+  }
+
+  await saveJSON();
+  alert("CSV imported successfully");
 }
 
 /* ================= EVENTS ================= */
