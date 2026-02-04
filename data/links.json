@@ -2,9 +2,9 @@
   "links": [
     {
       "id": "5489d898-0f02-42ef-b7fe-4d178d9374e6",
-      "title": "FILTERS: Categories - Automotive & Transportation",
-      "path": "/c/1",
-      "redirectTo": "https://www.thegreekdirectory.org/listings?category=Automotive+%26+Transportation"
+      "title": null,
+      "path": null,
+      "redirectTo": null
     },
     {
       "id": "0621d711-8eb3-433f-941c-5d70ff0a6ad8",
@@ -95,6 +95,12 @@
       "title": "Docs",
       "path": "/docs/api",
       "redirectTo": "https://docs.example.com/api"
+    },
+    {
+      "id": "be6078e8-05f5-4c26-a008-24a7978e70b9",
+      "title": "App",
+      "path": "/app",
+      "redirectTo": "https://thegreekdirectory.org/app"
     }
   ]
 }
