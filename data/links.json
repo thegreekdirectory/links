@@ -101,6 +101,18 @@
       "title": "App",
       "path": "/app",
       "redirectTo": "https://thegreekdirectory.org/app"
+    },
+    {
+      "id": "487c7a9d-7bfd-4c23-bf03-79a17320a9e7",
+      "title": "Google",
+      "path": "/google",
+      "redirectTo": "https://google.com"
+    },
+    {
+      "id": "2605c0b1-34a9-49b2-a65f-ea7f54500984",
+      "title": "Docs",
+      "path": "/docs/api",
+      "redirectTo": "https://docs.example.com/api"
     }
   ]
 }
