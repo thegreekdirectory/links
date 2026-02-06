@@ -1,11 +1,19 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="refresh" content="0;url={{REDIRECT_URL}}">
-  <script>location.href="{{REDIRECT_URL}}"</script>
+  <meta charset="UTF-8">
+  <title>Redirecting…</title>
+  <meta http-equiv="refresh" content="0.2;url={{REDIRECT_URL}}">
+  <meta name="shortlink-redirect" content="{{REDIRECT_URL}}">
+  <script src="/analytics.js" data-redirect="{{REDIRECT_URL}}" defer></script>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      padding: 2rem;
+    }
+  </style>
 </head>
 <body>
-Redirecting to <a href="{{REDIRECT_URL}}">{{REDIRECT_URL}}</a>
+  <p>Redirecting to <a href="{{REDIRECT_URL}}">{{REDIRECT_URL}}</a></p>
 </body>
 </html>

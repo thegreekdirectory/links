@@ -48,6 +48,32 @@
 
     <!-- LIST -->
     <div id="list" class="space-y-2"></div>
+
+    <!-- ANALYTICS -->
+    <div class="mt-10">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-xl font-semibold">Analytics Summary</h2>
+        <button onclick="loadAnalyticsSummary()"
+          class="bg-blue-600 text-white px-4 py-2 rounded">
+          Refresh Analytics
+        </button>
+      </div>
+      <div id="analyticsStatus" class="text-sm text-gray-600 mb-3">
+        Analytics summary will load after login.
+      </div>
+      <div class="overflow-x-auto">
+        <table class="min-w-full text-sm border">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="text-left p-2 border">Path</th>
+              <th class="text-left p-2 border">Total Events</th>
+              <th class="text-left p-2 border">Last Seen</th>
+            </tr>
+          </thead>
+          <tbody id="analyticsTable"></tbody>
+        </table>
+      </div>
+    </div>
   </div>
 
 <script>
@@ -58,6 +84,9 @@ const REPO = "links";
 const LINKS_JSON = "data/links.json";
 const TEMPLATE_PATH = "_template.html";
 const REDIRECT_DIR = ""; // root
+const SUPABASE_URL = "https://luetekzqrrgdxtopzvqw.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1ZXRla3pxcnJnZHh0b3B6dnF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgzNDc2NDcsImV4cCI6MjA4MzkyMzY0N30.TIrNG8VGumEJc_9JvNHW-Q-UWfUGpPxR0v8POjWZJYg";
+const ANALYTICS_TABLE = "shortlink_events";
 
 let token = "";
 let links = [];
@@ -70,6 +99,7 @@ function login() {
   loginBox.classList.add("hidden");
   controls.classList.remove("hidden");
   loadLinks();
+  loadAnalyticsSummary();
 }
 
 /* ================= HELPERS ================= */
@@ -138,6 +168,57 @@ function render() {
         </div>
       `;
     });
+}
+
+/* ================= ANALYTICS ================= */
+
+function formatTimestamp(value) {
+  if (!value) return "—";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleString();
+}
+
+async function loadAnalyticsSummary() {
+  analyticsStatus.textContent = "Loading analytics summary...";
+  analyticsTable.innerHTML = "";
+
+  const url = new URL(`${SUPABASE_URL}/rest/v1/${ANALYTICS_TABLE}`);
+  url.searchParams.set("select", "path,count:count(),last_seen:max(event_time)");
+  url.searchParams.set("group", "path");
+  url.searchParams.set("order", "last_seen.desc");
+
+  try {
+    const res = await fetch(url.toString(), {
+      headers: {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`
+      }
+    });
+
+    if (!res.ok) {
+      throw new Error(`Analytics request failed: ${res.status}`);
+    }
+
+    const data = await res.json();
+    if (!data.length) {
+      analyticsStatus.textContent = "No analytics events yet.";
+      return;
+    }
+
+    const totalEvents = data.reduce((sum, item) => sum + Number(item.count || 0), 0);
+    analyticsStatus.textContent = `Loaded ${totalEvents} events across ${data.length} paths.`;
+
+    analyticsTable.innerHTML = data.map(item => `
+      <tr>
+        <td class="p-2 border font-mono text-xs">${item.path}</td>
+        <td class="p-2 border">${item.count}</td>
+        <td class="p-2 border">${formatTimestamp(item.last_seen)}</td>
+      </tr>
+    `).join("");
+  } catch (error) {
+    analyticsStatus.textContent = "Failed to load analytics summary.";
+  }
 }
 
 /* ================= TEMPLATE ================= */
