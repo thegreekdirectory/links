@@ -113,6 +113,12 @@
       "title": "Docs",
       "path": "/docs/api",
       "redirectTo": "https://docs.example.com/api"
+    },
+    {
+      "id": "babc1e8c-6898-42a9-9fdb-1c2f020d0479",
+      "title": "f",
+      "path": "/s",
+      "redirectTo": "https://example.com"
     }
   ]
 }
