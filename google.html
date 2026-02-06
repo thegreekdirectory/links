@@ -1,11 +1,19 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="refresh" content="0;url=https://google.com">
-  <script>location.href="https://google.com"</script>
+  <meta charset="UTF-8">
+  <title>Redirecting…</title>
+  <meta http-equiv="refresh" content="0.2;url=https://google.com">
+  <meta name="shortlink-redirect" content="https://google.com">
+  <script src="/analytics.js" data-redirect="https://google.com" defer></script>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      padding: 2rem;
+    }
+  </style>
 </head>
 <body>
-Redirecting to <a href="https://google.com">https://google.com</a>
+  <p>Redirecting to <a href="https://google.com">https://google.com</a></p>
 </body>
 </html>
