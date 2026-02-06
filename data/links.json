@@ -119,6 +119,12 @@
       "title": "f",
       "path": "/s",
       "redirectTo": "https://example.com"
+    },
+    {
+      "id": "985a561d-ef42-49a3-bec2-eb7d51c26be0",
+      "title": "Download App",
+      "path": "/app",
+      "redirectTo": "https://thegreekdirectory.org/app"
     }
   ]
 }
