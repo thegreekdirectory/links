@@ -1,424 +1,458 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Redirect Admin</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+<meta charset="UTF-8" />
+<title>Redirect Admin</title>
+<script src="https://cdn.tailwindcss.com"></script>
 </head>
 
 <body class="bg-gray-100 min-h-screen p-6">
-  <div class="max-w-6xl mx-auto bg-white shadow rounded p-6">
 
-    <h1 class="text-2xl font-bold mb-4">Redirect Admin</h1>
+<div class="max-w-6xl mx-auto bg-white shadow rounded p-6">
 
-    <!-- LOGIN -->
-    <div id="loginBox" class="mb-6">
-      <input id="tokenInput" type="password"
-        placeholder="GitHub Personal Access Token"
-        class="border p-2 w-full mb-2">
-      <button onclick="login()"
-        class="bg-blue-600 text-white px-4 py-2 rounded">
-        Login
-      </button>
-    </div>
+<h1 class="text-2xl font-bold mb-4">Redirect Admin</h1>
 
-    <!-- CONTROLS -->
-    <div id="controls" class="hidden mb-4 flex gap-2 items-center">
-      <input id="searchInput" placeholder="Search..."
-        class="border p-2 flex-1">
+<div id="loginBox" class="mb-6">
+<input id="tokenInput" type="password"
+placeholder="GitHub Personal Access Token"
+class="border p-2 w-full mb-2">
 
-      <input type="file" id="csvInput" accept=".csv"
-        class="border p-2">
+<button onclick="login()"
+class="bg-blue-600 text-white px-4 py-2 rounded">
+Login
+</button>
+</div>
 
-      <button onclick="importCSV()"
-        class="bg-purple-600 text-white px-4 py-2 rounded">
-        Import CSV
-      </button>
+<div id="controls" class="hidden mb-4 flex gap-2 items-center">
 
-      <button onclick="openNew()"
-        class="bg-green-600 text-white px-4 py-2 rounded">
-        New Link
-      </button>
+<input id="searchInput" placeholder="Search..."
+class="border p-2 flex-1">
 
-      <button onclick="loadLinks()"
-        class="bg-gray-600 text-white px-4 py-2 rounded">
-        Refresh
-      </button>
-    </div>
+<input type="file" id="csvInput" accept=".csv"
+class="border p-2">
 
-    <!-- LIST -->
-    <div id="list" class="space-y-2"></div>
+<button onclick="importCSV()"
+class="bg-purple-600 text-white px-4 py-2 rounded">
+Import CSV
+</button>
 
-    <!-- ANALYTICS -->
-    <div class="mt-10">
-      <div class="flex items-center justify-between mb-3">
-        <h2 class="text-xl font-semibold">Analytics Summary</h2>
-        <button onclick="loadAnalyticsSummary()"
-          class="bg-blue-600 text-white px-4 py-2 rounded">
-          Refresh Analytics
-        </button>
-      </div>
-      <div id="analyticsStatus" class="text-sm text-gray-600 mb-3">
-        Analytics summary will load after login.
-      </div>
-      <div class="overflow-x-auto">
-        <table class="min-w-full text-sm border">
-          <thead class="bg-gray-50">
-            <tr>
-              <th class="text-left p-2 border">Path</th>
-              <th class="text-left p-2 border">Total Events</th>
-              <th class="text-left p-2 border">Last Seen</th>
-            </tr>
-          </thead>
-          <tbody id="analyticsTable"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
+<button onclick="openNew()"
+class="bg-green-600 text-white px-4 py-2 rounded">
+New Link
+</button>
+
+<button onclick="loadLinks()"
+class="bg-gray-600 text-white px-4 py-2 rounded">
+Refresh
+</button>
+
+</div>
+
+<div id="list" class="space-y-2"></div>
+
+<div class="mt-10">
+
+<div class="flex items-center justify-between mb-3">
+<h2 class="text-xl font-semibold">Analytics Summary</h2>
+
+<button onclick="loadAnalyticsSummary()"
+class="bg-blue-600 text-white px-4 py-2 rounded">
+Refresh Analytics
+</button>
+</div>
+
+<div id="analyticsStatus" class="text-sm text-gray-600 mb-3">
+Analytics summary will load after login.
+</div>
+
+<div class="overflow-x-auto">
+
+<table class="min-w-full text-sm border">
+
+<thead class="bg-gray-50">
+<tr>
+<th class="text-left p-2 border">Path</th>
+<th class="text-left p-2 border">Total Events</th>
+<th class="text-left p-2 border">Last Seen</th>
+</tr>
+</thead>
+
+<tbody id="analyticsTable"></tbody>
+
+</table>
+</div>
+</div>
+</div>
 
 <script>
-/* ================= CONFIG ================= */
 
-const OWNER = "thegreekdirectory";
-const REPO = "links";
-const LINKS_JSON = "data/links.json";
-const TEMPLATE_PATH = "_template.html";
-const REDIRECT_DIR = ""; // root
-const SUPABASE_URL = "https://luetekzqrrgdxtopzvqw.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1ZXRla3pxcnJnZHh0b3B6dnF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgzNDc2NDcsImV4cCI6MjA4MzkyMzY0N30.TIrNG8VGumEJc_9JvNHW-Q-UWfUGpPxR0v8POjWZJYg";
-const ANALYTICS_TABLE = "shortlink_events";
+/* CONFIG */
 
-let token = "";
-let links = [];
+const OWNER="thegreekdirectory"
+const REPO="links"
+const LINKS_JSON="data/links.json"
+const TEMPLATE_PATH="_template.html"
+const REDIRECT_DIR=""
 
-/* ================= AUTH ================= */
+const SUPABASE_URL="https://luetekzqrrgdxtopzvqw.supabase.co"
+const SUPABASE_ANON_KEY="YOURKEY"
+const ANALYTICS_TABLE="shortlink_events"
 
-function login() {
-  token = tokenInput.value.trim();
-  if (!token) return alert("Token required");
-  loginBox.classList.add("hidden");
-  controls.classList.remove("hidden");
-  loadLinks();
-  loadAnalyticsSummary();
+let token=""
+let links=[]
+
+/* AUTH */
+
+function login(){
+
+token=tokenInput.value.trim()
+
+if(!token)return alert("Token required")
+
+loginBox.classList.add("hidden")
+controls.classList.remove("hidden")
+
+loadLinks()
+loadAnalyticsSummary()
+
 }
 
-/* ================= HELPERS ================= */
+/* HELPERS */
 
-function gh(path) {
-  return fetch(
-    `https://api.github.com/repos/${OWNER}/${REPO}/contents/${path}`,
-    { headers: { Authorization: `token ${token}` } }
-  );
+function gh(path){
+
+return fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${path}`,{
+
+headers:{Authorization:`token ${token}`}
+
+})
+
 }
 
-function requireValidPath(path) {
-  if (!path.startsWith("/")) {
-    alert("Path must start with /");
-    return false;
-  }
-  return true;
+function requireValidPath(path){
+
+if(!path.startsWith("/")){
+
+alert("Path must start with /")
+return false
+
 }
 
-function requireValidURL(url) {
-  if (!url.startsWith("https://")) {
-    alert("Redirect URL must start with https://");
-    return false;
-  }
-  return true;
+return true
+
 }
 
-function filePathFromPath(path) {
-  return path.replace(/^\//, "") + ".html";
+function requireValidURL(url){
+
+if(!url.startsWith("https://")){
+
+alert("Redirect URL must start with https://")
+return false
+
 }
 
-/* ================= LOAD ================= */
+return true
 
-async function loadLinks() {
-  const res = await gh(LINKS_JSON);
-  const file = await res.json();
-  links = JSON.parse(atob(file.content)).links;
-  render();
 }
 
-/* ================= RENDER ================= */
+function filePathFromPath(path){
 
-function render() {
-  const q = searchInput.value.toLowerCase();
-  list.innerHTML = "";
+return path.replace(/^\//,"")+".html"
 
-  links
-    .filter(l =>
-      l.title.toLowerCase().includes(q) ||
-      l.path.toLowerCase().includes(q) ||
-      l.redirectTo.toLowerCase().includes(q)
-    )
-    .forEach(l => {
-      list.innerHTML += `
-        <div class="border rounded p-3 flex justify-between items-center">
-          <div>
-            <div class="font-semibold">${l.title}</div>
-            <div class="text-sm text-gray-600">
-              ${l.path} → ${l.redirectTo}
-            </div>
-          </div>
-          <div class="space-x-3">
-            <button onclick="editLink('${l.id}')" class="text-blue-600">Edit</button>
-            <button onclick="deleteLink('${l.id}')" class="text-red-600">Delete</button>
-          </div>
-        </div>
-      `;
-    });
 }
 
-/* ================= ANALYTICS ================= */
+/* FETCH METADATA */
 
-function formatTimestamp(value) {
-  if (!value) return "—";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
-  return date.toLocaleString();
+async function fetchMetadata(url){
+
+try{
+
+const res=await fetch("https://api.allorigins.win/raw?url="+encodeURIComponent(url))
+
+const html=await res.text()
+
+const titleMatch=html.match(/<meta property="og:title" content="([^"]+)"/i)
+|| html.match(/<title[^>]*>(.*?)<\/title>/i)
+
+const descMatch=html.match(/<meta property="og:description" content="([^"]+)"/i)
+|| html.match(/<meta name="description" content="([^"]+)"/i)
+
+return{
+
+title:titleMatch?titleMatch[1].trim():"Redirecting…",
+description:descMatch?descMatch[1].trim():""
+
 }
 
-async function loadAnalyticsSummary() {
-  analyticsStatus.textContent = "Loading analytics summary...";
-  analyticsTable.innerHTML = "";
+}catch{
 
-  const url = new URL(`${SUPABASE_URL}/rest/v1/${ANALYTICS_TABLE}`);
-  url.searchParams.set("select", "path,count:count(),last_seen:max(event_time)");
-  url.searchParams.set("group", "path");
-  url.searchParams.set("order", "last_seen.desc");
+return{
 
-  try {
-    const res = await fetch(url.toString(), {
-      headers: {
-        apikey: SUPABASE_ANON_KEY,
-        Authorization: `Bearer ${SUPABASE_ANON_KEY}`
-      }
-    });
+title:"Redirecting…",
+description:""
 
-    if (!res.ok) {
-      throw new Error(`Analytics request failed: ${res.status}`);
-    }
-
-    const data = await res.json();
-    if (!data.length) {
-      analyticsStatus.textContent = "No analytics events yet.";
-      return;
-    }
-
-    const totalEvents = data.reduce((sum, item) => sum + Number(item.count || 0), 0);
-    analyticsStatus.textContent = `Loaded ${totalEvents} events across ${data.length} paths.`;
-
-    analyticsTable.innerHTML = data.map(item => `
-      <tr>
-        <td class="p-2 border font-mono text-xs">${item.path}</td>
-        <td class="p-2 border">${item.count}</td>
-        <td class="p-2 border">${formatTimestamp(item.last_seen)}</td>
-      </tr>
-    `).join("");
-  } catch (error) {
-    analyticsStatus.textContent = "Failed to load analytics summary.";
-  }
 }
 
-/* ================= TEMPLATE ================= */
-
-async function loadTemplate() {
-  const res = await gh(TEMPLATE_PATH);
-  const file = await res.json();
-  return atob(file.content);
 }
 
-/* ================= FILE OPS ================= */
-
-async function writeRedirect(path, redirectTo) {
-  const filePath = filePathFromPath(path);
-  let html = await loadTemplate();
-  html = html.replaceAll("{{REDIRECT_URL}}", redirectTo);
-
-  const content = btoa(html);
-
-  let sha = null;
-  const check = await gh(filePath);
-  if (check.ok) sha = (await check.json()).sha;
-
-  await fetch(
-    `https://api.github.com/repos/${OWNER}/${REPO}/contents/${filePath}`,
-    {
-      method: "PUT",
-      headers: {
-        Authorization: `token ${token}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        message: "Write redirect page",
-        content,
-        ...(sha && { sha })
-      })
-    }
-  );
 }
 
-async function removeRedirect(path) {
-  const filePath = filePathFromPath(path);
-  const res = await gh(filePath);
-  if (!res.ok) return;
-  const file = await res.json();
+/* LOAD LINKS */
 
-  await fetch(
-    `https://api.github.com/repos/${OWNER}/${REPO}/contents/${filePath}`,
-    {
-      method: "DELETE",
-      headers: {
-        Authorization: `token ${token}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        message: "Delete redirect page",
-        sha: file.sha
-      })
-    }
-  );
+async function loadLinks(){
+
+const res=await gh(LINKS_JSON)
+const file=await res.json()
+
+links=JSON.parse(atob(file.content)).links
+
+render()
+
 }
 
-/* ================= SAVE JSON ================= */
+/* RENDER */
 
-async function saveJSON() {
-  const res = await gh(LINKS_JSON);
-  const file = await res.json();
+function render(){
 
-  await fetch(
-    `https://api.github.com/repos/${OWNER}/${REPO}/contents/${LINKS_JSON}`,
-    {
-      method: "PUT",
-      headers: {
-        Authorization: `token ${token}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        message: "Update links.json",
-        content: btoa(JSON.stringify({ links }, null, 2)),
-        sha: file.sha
-      })
-    }
-  );
+const q=searchInput.value.toLowerCase()
 
-  loadLinks();
+list.innerHTML=""
+
+links.filter(l=>
+
+(l.title||"").toLowerCase().includes(q) ||
+(l.path||"").toLowerCase().includes(q) ||
+(l.redirectTo||"").toLowerCase().includes(q)
+
+).forEach(l=>{
+
+list.innerHTML+=`
+
+<div class="border rounded p-3 flex justify-between items-center">
+
+<div>
+
+<div class="font-semibold">${l.title||"(no title)"}</div>
+
+<div class="text-sm text-gray-600">
+${l.path} → ${l.redirectTo}
+</div>
+
+</div>
+
+<div class="space-x-3">
+
+<button onclick="editLink('${l.id}')" class="text-blue-600">Edit</button>
+<button onclick="deleteLink('${l.id}')" class="text-red-600">Delete</button>
+
+</div>
+
+</div>
+
+`
+
+})
+
 }
 
-/* ================= CRUD ================= */
+/* TEMPLATE */
 
-async function openNew() {
-  const title = prompt("Title");
-  const path = prompt("Path (/anything)");
-  const redirectTo = prompt("Redirect URL (https://...)");
+async function loadTemplate(){
 
-  if (!title || !path || !redirectTo) return;
-  if (!requireValidPath(path) || !requireValidURL(redirectTo)) return;
+const res=await gh(TEMPLATE_PATH)
+const file=await res.json()
 
-  const link = {
-    id: crypto.randomUUID(),
-    title,
-    path,
-    redirectTo
-  };
+return atob(file.content)
 
-  links.push(link);
-  await writeRedirect(path, redirectTo);
-  await saveJSON();
 }
 
-async function editLink(id) {
-  const link = links.find(l => l.id === id);
-  const oldPath = link.path;
+/* WRITE REDIRECT */
 
-  link.title = prompt("Title", link.title);
-  link.path = prompt("Path", link.path);
-  link.redirectTo = prompt("Redirect URL", link.redirectTo);
+async function writeRedirect(path,redirectTo){
 
-  if (!requireValidPath(link.path) || !requireValidURL(link.redirectTo)) return;
+const filePath=filePathFromPath(path)
 
-  if (oldPath !== link.path) {
-    await removeRedirect(oldPath);
-  }
+let html=await loadTemplate()
 
-  await writeRedirect(link.path, link.redirectTo);
-  await saveJSON();
+const meta=await fetchMetadata(redirectTo)
+
+html=html.replaceAll("{{TITLE}}",meta.title)
+html=html.replaceAll("{{DESCRIPTION}}",meta.description)
+html=html.replaceAll("{{REDIRECT_URL}}",redirectTo)
+
+const content=btoa(html)
+
+let sha=null
+
+const check=await gh(filePath)
+
+if(check.ok)sha=(await check.json()).sha
+
+await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${filePath}`,{
+
+method:"PUT",
+
+headers:{
+
+Authorization:`token ${token}`,
+"Content-Type":"application/json"
+
+},
+
+body:JSON.stringify({
+
+message:"Write redirect page",
+content,
+...(sha&&{sha})
+
+})
+
+})
+
 }
 
-async function deleteLink(id) {
-  if (!confirm("Delete this redirect and its HTML file?")) return;
+/* SAVE JSON */
 
-  const index = links.findIndex(l => l.id === id);
-  const link = links[index];
+async function saveJSON(){
 
-  // 1. Delete HTML file first
-  const res = await gh(filePathFromPath(link.path));
-  if (!res.ok) {
-    alert("HTML file not found or could not be deleted.");
-    return;
-  }
+const res=await gh(LINKS_JSON)
+const file=await res.json()
 
-  const file = await res.json();
+await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${LINKS_JSON}`,{
 
-  const del = await fetch(
-    `https://api.github.com/repos/${OWNER}/${REPO}/contents/${filePathFromPath(link.path)}`,
-    {
-      method: "DELETE",
-      headers: {
-        Authorization: `token ${token}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        message: "Delete redirect page",
-        sha: file.sha
-      })
-    }
-  );
+method:"PUT",
 
-  if (!del.ok) {
-    alert("Failed to delete HTML file.");
-    return;
-  }
+headers:{
 
-  // 2. Only now update JSON
-  links.splice(index, 1);
-  await saveJSON();
+Authorization:`token ${token}`,
+"Content-Type":"application/json"
+
+},
+
+body:JSON.stringify({
+
+message:"Update links.json",
+content:btoa(JSON.stringify({links},null,2)),
+sha:file.sha
+
+})
+
+})
+
+loadLinks()
+
 }
 
+/* CRUD */
 
-/* ================= CSV IMPORT ================= */
+async function openNew(){
 
-async function importCSV() {
-  const file = csvInput.files[0];
-  if (!file) return alert("Select a CSV first");
+const redirectTo=prompt("Redirect URL (https://...)")
 
-  const text = await file.text();
-  const rows = text.trim().split("\n").slice(1);
+if(!redirectTo)return
 
-  for (const row of rows) {
-    const [title, path, redirectTo] = row.split(",");
+if(!requireValidURL(redirectTo))return
 
-    if (!title || !path || !redirectTo) continue;
-    if (!requireValidPath(path) || !requireValidURL(redirectTo)) continue;
+const meta=await fetchMetadata(redirectTo)
 
-    links.push({
-      id: crypto.randomUUID(),
-      title: title.trim(),
-      path: path.trim(),
-      redirectTo: redirectTo.trim()
-    });
+const title=prompt("Title",meta.title)
+const path=prompt("Path (/anything)")
 
-    await writeRedirect(path.trim(), redirectTo.trim());
-  }
+if(!title||!path)return
 
-  await saveJSON();
-  alert("CSV imported successfully");
+if(!requireValidPath(path))return
+
+const link={
+
+id:crypto.randomUUID(),
+title,
+path,
+redirectTo
+
 }
 
-/* ================= EVENTS ================= */
+links.push(link)
 
-searchInput.addEventListener("input", render);
+await writeRedirect(path,redirectTo)
+
+await saveJSON()
+
+}
+
+/* ANALYTICS */
+
+function formatTimestamp(value){
+
+if(!value)return "—"
+
+const date=new Date(value)
+
+if(Number.isNaN(date.getTime()))return value
+
+return date.toLocaleString()
+
+}
+
+async function loadAnalyticsSummary(){
+
+analyticsStatus.textContent="Loading analytics summary..."
+
+analyticsTable.innerHTML=""
+
+const url=new URL(`${SUPABASE_URL}/rest/v1/${ANALYTICS_TABLE}`)
+
+url.searchParams.set("select","path,count:count(),last_seen:max(event_time)")
+url.searchParams.set("group","path")
+url.searchParams.set("order","last_seen.desc")
+
+try{
+
+const res=await fetch(url.toString(),{
+
+headers:{
+
+apikey:SUPABASE_ANON_KEY,
+Authorization:`Bearer ${SUPABASE_ANON_KEY}`
+
+}
+
+})
+
+if(!res.ok)throw new Error()
+
+const data=await res.json()
+
+if(!data.length){
+
+analyticsStatus.textContent="No analytics events yet."
+return
+
+}
+
+const totalEvents=data.reduce((sum,i)=>sum+Number(i.count||0),0)
+
+analyticsStatus.textContent=`Loaded ${totalEvents} events across ${data.length} paths.`
+
+analyticsTable.innerHTML=data.map(item=>`
+
+<tr>
+<td class="p-2 border font-mono text-xs">${item.path}</td>
+<td class="p-2 border">${item.count}</td>
+<td class="p-2 border">${formatTimestamp(item.last_seen)}</td>
+</tr>
+
+`).join("")
+
+}catch{
+
+analyticsStatus.textContent="Failed to load analytics summary."
+
+}
+
+}
+
+searchInput.addEventListener("input",render)
+
 </script>
 
 </body>
