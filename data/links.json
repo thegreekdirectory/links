@@ -80,9 +80,11 @@
     },
     {
       "id": "985a561d-ef42-49a3-bec2-eb7d51c26be0",
-      "title": "Download App",
+      "title": "GENERAL: Download App",
       "path": "/app",
-      "redirectTo": "https://thegreekdirectory.org/app"
+      "redirectTo": "https://thegreekdirectory.org/app",
+      "fetchedTitle": "The Greek Directory",
+      "fetchedDescription": ""
     },
     {
       "id": "8b9f408e-24e4-40ca-b4a3-3a45feabcf8d",
@@ -107,7 +109,7 @@
       "title": "ReportBug",
       "path": "/bug",
       "redirectTo": "https://forms.gle/1zaLR8PCajgoV3ej9",
-      "fetchedTitle": "Redirectingâ¦",
+      "fetchedTitle": "RedirectingÃ¢ÂÂ¦",
       "fetchedDescription": ""
     },
     {
@@ -115,7 +117,7 @@
       "title": "Contact",
       "path": "/contact",
       "redirectTo": "https://thegreekdirectory.org/contact",
-      "fetchedTitle": "Redirecting…",
+      "fetchedTitle": "Redirectingâ¦",
       "fetchedDescription": ""
     }
   ]
