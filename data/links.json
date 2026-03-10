@@ -4,79 +4,105 @@
       "id": "0621d711-8eb3-433f-941c-5d70ff0a6ad8",
       "title": "FILTERS: Categories - Beauty & Health",
       "path": "/c/2",
-      "redirectTo": "https://www.thegreekdirectory.org/listings?category=Beauty+%26+Health"
+      "redirectTo": "https://www.thegreekdirectory.org/listings?category=Beauty+%26+Health",
+      "fetchedTitle": "The Greek Directory - Listings",
+      "fetchedDescription": "This page is under construction. Check back soon!"
     },
     {
       "id": "5e50831f-45f4-4c58-b334-14f59b6d5551",
       "title": "FILTERS: Categories - Church & Religious Organization",
       "path": "/c/3",
-      "redirectTo": "https://www.thegreekdirectory.org/listings?category=Church+%26+Religious+Organization"
+      "redirectTo": "https://www.thegreekdirectory.org/listings?category=Church+%26+Religious+Organization",
+      "fetchedTitle": "The Greek Directory - Listings",
+      "fetchedDescription": "This page is under construction. Check back soon!"
     },
     {
       "id": "6471e766-2df4-48a0-8f1b-69a0fec702c8",
       "title": "FILTERS: Categories - Cultural/Fraternal Organization",
       "path": "/c/4",
-      "redirectTo": "https://www.thegreekdirectory.org/listings?category=Cultural%2FFraternal+Organization"
+      "redirectTo": "https://www.thegreekdirectory.org/listings?category=Cultural%2FFraternal+Organization",
+      "fetchedTitle": "The Greek Directory - Listings",
+      "fetchedDescription": "This page is under construction. Check back soon!"
     },
     {
       "id": "1d4c4e19-db74-4e3e-a5b7-5a70385b93ef",
       "title": "FILTERS: Categories - Education & Community",
       "path": "/c/5",
-      "redirectTo": "https://www.thegreekdirectory.org/listings?category=Education+%26+Community"
+      "redirectTo": "https://www.thegreekdirectory.org/listings?category=Education+%26+Community",
+      "fetchedTitle": "The Greek Directory - Listings",
+      "fetchedDescription": "This page is under construction. Check back soon!"
     },
     {
       "id": "ebf47ffd-1f54-4b58-afa8-bee321b81b10",
       "title": "FILTERS: Categories - Entertainment, Arts & Recreation",
       "path": "/c/6",
-      "redirectTo": "https://www.thegreekdirectory.org/listings?category=Entertainment%2C+Arts+%26+Recreation"
+      "redirectTo": "https://www.thegreekdirectory.org/listings?category=Entertainment%2C+Arts+%26+Recreation",
+      "fetchedTitle": "The Greek Directory - Listings",
+      "fetchedDescription": "This page is under construction. Check back soon!"
     },
     {
       "id": "3262be41-e246-4d4a-90f4-b21dfc615cc5",
       "title": "FILTERS: Categories - Food & Hospitality",
       "path": "/c/7",
-      "redirectTo": "https://www.thegreekdirectory.org/listings?category=Food+%26+Hospitality"
+      "redirectTo": "https://www.thegreekdirectory.org/listings?category=Food+%26+Hospitality",
+      "fetchedTitle": "The Greek Directory - Listings",
+      "fetchedDescription": "This page is under construction. Check back soon!"
     },
     {
       "id": "b5666993-23d0-4986-b544-f133ec216380",
       "title": "FILTERS: Categories - Grocery & Imports",
       "path": "/c/8",
-      "redirectTo": "https://www.thegreekdirectory.org/listings?category=Grocery+%26+Imports"
+      "redirectTo": "https://www.thegreekdirectory.org/listings?category=Grocery+%26+Imports",
+      "fetchedTitle": "The Greek Directory - Listings",
+      "fetchedDescription": "This page is under construction. Check back soon!"
     },
     {
       "id": "fec7fead-fe18-4139-9242-2854d9995d1a",
       "title": "FILTERS: Categories - Home & Construction",
       "path": "/c/9",
-      "redirectTo": "https://www.thegreekdirectory.org/listings?category=Home+%26+Construction"
+      "redirectTo": "https://www.thegreekdirectory.org/listings?category=Home+%26+Construction",
+      "fetchedTitle": "The Greek Directory - Listings",
+      "fetchedDescription": "This page is under construction. Check back soon!"
     },
     {
       "id": "706831be-9fae-4e74-937d-dea6babaf4c0",
       "title": "FILTERS: Categories - Industrial & Manufacturing",
       "path": "/c/10",
-      "redirectTo": "https://www.thegreekdirectory.org/listings?category=Industrial+%26+Manufacturing"
+      "redirectTo": "https://www.thegreekdirectory.org/listings?category=Industrial+%26+Manufacturing",
+      "fetchedTitle": "The Greek Directory - Listings",
+      "fetchedDescription": "This page is under construction. Check back soon!"
     },
     {
       "id": "30236a14-c764-4749-adb9-dd27b8469829",
       "title": "FILTERS: Categories - Pets & Veterinary",
       "path": "/c/11",
-      "redirectTo": "https://www.thegreekdirectory.org/listings?category=Pets+%26+Veterinary"
+      "redirectTo": "https://www.thegreekdirectory.org/listings?category=Pets+%26+Veterinary",
+      "fetchedTitle": "Redirecting…",
+      "fetchedDescription": ""
     },
     {
       "id": "b2b083c8-076d-46bb-a438-df2c073fcb1e",
       "title": "FILTERS: Categories - Professional & Business Services",
       "path": "/c/12",
-      "redirectTo": "https://www.thegreekdirectory.org/listings?category=Professional+%26+Business+Services"
+      "redirectTo": "https://www.thegreekdirectory.org/listings?category=Professional+%26+Business+Services",
+      "fetchedTitle": "The Greek Directory - Listings",
+      "fetchedDescription": "This page is under construction. Check back soon!"
     },
     {
       "id": "21d08287-c7d4-4aeb-b177-f9c4f08c7389",
       "title": "FILTERS: Categories - Real Estate & Development",
       "path": "/c/13",
-      "redirectTo": "https://www.thegreekdirectory.org/listings?category=Real+Estate+%26+Development"
+      "redirectTo": "https://www.thegreekdirectory.org/listings?category=Real+Estate+%26+Development",
+      "fetchedTitle": "Redirecting…",
+      "fetchedDescription": ""
     },
     {
       "id": "e48585f8-e5ee-4d00-a571-ba10d204d037",
       "title": "FILTERS: Categories - Retail & Shopping",
       "path": "/c/14",
-      "redirectTo": "https://www.thegreekdirectory.org/listings?category=Retail+%26+Shopping"
+      "redirectTo": "https://www.thegreekdirectory.org/listings?category=Retail+%26+Shopping",
+      "fetchedTitle": "Redirecting…",
+      "fetchedDescription": ""
     },
     {
       "id": "985a561d-ef42-49a3-bec2-eb7d51c26be0",
@@ -90,58 +116,64 @@
       "id": "8b9f408e-24e4-40ca-b4a3-3a45feabcf8d",
       "title": "Google",
       "path": "/google",
-      "redirectTo": "https://google.com"
+      "redirectTo": "https://google.com",
+      "fetchedTitle": "Redirecting…",
+      "fetchedDescription": ""
     },
     {
       "id": "56d8e7d1-7e2a-43a3-9de2-6898973a18e8",
       "title": "Docs",
       "path": "/docs/api",
-      "redirectTo": "https://docs.example.com/api"
+      "redirectTo": "https://docs.example.com/api",
+      "fetchedTitle": "Redirecting…",
+      "fetchedDescription": ""
     },
     {
       "id": "babc1e8c-6898-42a9-9fdb-1c2f020d0479",
       "title": "f",
       "path": "/s",
-      "redirectTo": "https://example.com"
+      "redirectTo": "https://example.com",
+      "fetchedTitle": "Example Domain",
+      "fetchedDescription": ""
     },
     {
       "id": "a4fd8909-cf29-4068-b724-79f063eae7f8",
       "title": "GENERAL: Report Bug",
       "path": "/bug",
       "redirectTo": "https://forms.gle/1zaLR8PCajgoV3ej9",
-      "fetchedTitle": "RedirectingÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¦",
-      "fetchedDescription": ""
+      "fetchedTitle": "Report a Bug",
+      "fetchedDescription": "If you noticed a bug on The Greek Directory, let us know here! We are always looking to make our Directory better for our users!\n\nFor our general contact form, click here."
     },
     {
       "id": "1abfe582-5e97-49d6-85ad-b808082dc6af",
       "title": "GENERAL: Contact",
       "path": "/contact",
       "redirectTo": "https://thegreekdirectory.org/contact",
-      "fetchedTitle": "RedirectingÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¦",
-      "fetchedDescription": ""
+      "fetchedTitle": "The Greek Directory - Contact",
+      "fetchedDescription": "Contact"
     },
     {
       "id": "fca7a240-8a3e-4912-a067-2eadc9897b3d",
       "title": "GENERAL: Legal/Terms",
       "path": "/terms",
       "redirectTo": "https://thegreekdirectory.org/legal/tos",
-      "fetchedTitle": "RedirectingÃÂÃÂ¢ÃÂÃÂÃÂÃÂ¦",
-      "fetchedDescription": ""
+      "fetchedTitle": "The Greek Directory - Terms of Service",
+      "fetchedDescription": "Last updated: February 8, 2026"
     },
     {
       "id": "3dc2ce51-cb67-4c4d-ae03-c717e69bc9d9",
       "title": "GENERAL: Legal/Privacy",
       "path": "/privacy",
       "redirectTo": "https://thegreekdirectory.org/legal/privacy",
-      "fetchedTitle": "RedirectingÃÂ¢ÃÂÃÂ¦",
-      "fetchedDescription": ""
+      "fetchedTitle": "The Greek Directory - Privacy Policy",
+      "fetchedDescription": "Last updated: February 9, 2026"
     },
     {
       "id": "2c207475-2800-434f-bd34-f54dff804398",
       "title": "GENERAL: Legal/Copyright",
       "path": "/copyright",
       "redirectTo": "https://thegreekdirectory.org/legal/copyright",
-      "fetchedTitle": "RedirectingÃ¢ÂÂ¦",
+      "fetchedTitle": "Redirecting…",
       "fetchedDescription": ""
     },
     {
@@ -149,16 +181,16 @@
       "title": "GENERAL: Homepage",
       "path": "/home",
       "redirectTo": "https://thegreekdirectory.org",
-      "fetchedTitle": "Redirectingâ¦",
-      "fetchedDescription": ""
+      "fetchedTitle": "The Greek Directory",
+      "fetchedDescription": "The Greek Directory™\nEst. 2025\n&quot;The directory for everything Greek.&quot;"
     },
     {
       "id": "29c6db82-f94e-4178-9776-dc4a90811b7d",
       "title": "GENERAL: Listings Page",
       "path": "/listings",
       "redirectTo": "https://thegreekdirectory.org/listings",
-      "fetchedTitle": "Redirecting…",
-      "fetchedDescription": ""
+      "fetchedTitle": "The Greek Directory - Listings",
+      "fetchedDescription": "This page is under construction. Check back soon!"
     }
   ]
 }
