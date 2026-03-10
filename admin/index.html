@@ -1,459 +1,589 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<title>Redirect Admin</title>
-<script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TGD Link Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'IBM Plex Sans', sans-serif; }
+    .mono { font-family: 'IBM Plex Mono', monospace; }
+    .fade-in { animation: fadeIn 0.18s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+    .modal-backdrop { backdrop-filter: blur(2px); }
+  </style>
 </head>
 
-<body class="bg-gray-100 min-h-screen p-6">
+<body class="bg-slate-950 text-slate-100 min-h-screen">
 
-<div class="max-w-6xl mx-auto bg-white shadow rounded p-6">
+  <!-- ── TOP NAV ── -->
+  <header class="border-b border-slate-800 px-6 py-3 flex items-center justify-between sticky top-0 z-30 bg-slate-950/95 backdrop-blur">
+    <div class="flex items-center gap-3">
+      <img src="https://social.thegreekdirectory.org/Logo2.png" class="h-7 w-auto" alt="TGD">
+      <span class="text-base font-semibold tracking-tight text-white">Link Admin</span>
+      <span class="text-xs mono bg-slate-800 text-slate-400 rounded px-2 py-0.5">tgd.gr</span>
+    </div>
+    <div id="statusBadge" class="text-xs mono text-slate-500">not logged in</div>
+  </header>
 
-<h1 class="text-2xl font-bold mb-4">Redirect Admin</h1>
+  <!-- ── LOGIN ── -->
+  <div id="loginScreen" class="flex items-center justify-center min-h-[calc(100vh-53px)] px-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-8 w-full max-w-sm shadow-2xl fade-in">
+      <h2 class="text-lg font-semibold mb-1">Sign in</h2>
+      <p class="text-slate-400 text-sm mb-5">Enter your GitHub Personal Access Token with <span class="mono text-slate-300">repo</span> scope.</p>
+      <input id="tokenInput" type="password" placeholder="ghp_..."
+        class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm mono focus:outline-none focus:ring-2 focus:ring-blue-500 mb-3">
+      <button onclick="login()"
+        class="w-full bg-blue-600 hover:bg-blue-500 transition-colors rounded-lg py-2 text-sm font-medium">
+        Login
+      </button>
+      <p id="loginError" class="text-red-400 text-xs mt-2 hidden"></p>
+    </div>
+  </div>
 
-<div id="loginBox" class="mb-6">
-<input id="tokenInput" type="password"
-placeholder="GitHub Personal Access Token"
-class="border p-2 w-full mb-2">
+  <!-- ── MAIN APP ── -->
+  <div id="app" class="hidden max-w-6xl mx-auto px-4 py-6 space-y-8 fade-in">
 
-<button onclick="login()"
-class="bg-blue-600 text-white px-4 py-2 rounded">
-Login
-</button>
-</div>
+    <!-- Controls bar -->
+    <div class="flex flex-wrap gap-2 items-center">
+      <input id="searchInput" placeholder="Search links…"
+        class="flex-1 min-w-48 bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+      <label class="flex items-center gap-2 bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm cursor-pointer hover:border-slate-500 transition-colors">
+        <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+        <span class="text-slate-300">Import CSV</span>
+        <input type="file" id="csvInput" accept=".csv" class="hidden" onchange="importCSV()">
+      </label>
+      <button onclick="openNew()"
+        class="bg-blue-600 hover:bg-blue-500 transition-colors rounded-lg px-4 py-2 text-sm font-medium flex items-center gap-2">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+        New Link
+      </button>
+      <button onclick="loadLinks()"
+        class="bg-slate-800 hover:bg-slate-700 transition-colors border border-slate-700 rounded-lg px-4 py-2 text-sm font-medium flex items-center gap-2">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+        Refresh
+      </button>
+    </div>
 
-<div id="controls" class="hidden mb-4 flex gap-2 items-center">
+    <!-- Links table -->
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
+      <div class="px-5 py-3 border-b border-slate-800 flex items-center justify-between">
+        <h2 class="font-semibold text-sm text-slate-300 uppercase tracking-wider">Links</h2>
+        <span id="linkCount" class="text-xs mono text-slate-500">—</span>
+      </div>
+      <div id="list" class="divide-y divide-slate-800/50 min-h-16">
+        <div class="flex items-center justify-center py-10 text-slate-600 text-sm">Loading…</div>
+      </div>
+    </div>
 
-<input id="searchInput" placeholder="Search..."
-class="border p-2 flex-1">
+    <!-- Analytics -->
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
+      <div class="px-5 py-3 border-b border-slate-800 flex items-center justify-between">
+        <h2 class="font-semibold text-sm text-slate-300 uppercase tracking-wider">Analytics</h2>
+        <button onclick="loadAnalyticsSummary()"
+          class="text-xs bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded px-3 py-1 transition-colors">
+          Refresh
+        </button>
+      </div>
+      <div id="analyticsStatus" class="px-5 py-2 text-xs text-slate-500 mono border-b border-slate-800/50 hidden"></div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="text-left text-xs text-slate-500 uppercase tracking-wider">
+              <th class="px-5 py-3 font-medium">Path</th>
+              <th class="px-5 py-3 font-medium">Events</th>
+              <th class="px-5 py-3 font-medium">Last Seen</th>
+            </tr>
+          </thead>
+          <tbody id="analyticsTable" class="divide-y divide-slate-800/50">
+            <tr><td colspan="3" class="px-5 py-8 text-center text-slate-600 text-sm">Analytics will load after login.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
 
-<input type="file" id="csvInput" accept=".csv"
-class="border p-2">
+  </div>
 
-<button onclick="importCSV()"
-class="bg-purple-600 text-white px-4 py-2 rounded">
-Import CSV
-</button>
+  <!-- ── MODAL ── -->
+  <div id="modal" class="hidden fixed inset-0 z-50 flex items-center justify-center px-4 modal-backdrop bg-black/60">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl w-full max-w-md fade-in">
+      <div class="flex items-center justify-between px-6 py-4 border-b border-slate-800">
+        <h3 id="modalTitle" class="font-semibold text-base">New Link</h3>
+        <button onclick="closeModal()" class="text-slate-500 hover:text-white transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="px-6 py-5 space-y-4">
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">Redirect URL <span class="text-red-400">*</span></label>
+          <div class="flex gap-2">
+            <input id="mRedirectTo" type="url" placeholder="https://…"
+              class="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm mono focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <button onclick="fetchMeta()" id="fetchBtn"
+              class="bg-slate-700 hover:bg-slate-600 transition-colors rounded-lg px-3 py-2 text-xs font-medium whitespace-nowrap">
+              Fetch Meta
+            </button>
+          </div>
+          <p id="metaStatus" class="text-xs text-slate-500 mt-1 hidden"></p>
+        </div>
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">Path <span class="text-red-400">*</span></label>
+          <input id="mPath" type="text" placeholder="/your-path"
+            class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm mono focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">Admin Label <span class="text-slate-600">(your internal name)</span></label>
+          <input id="mTitle" type="text" placeholder="e.g. Summer Campaign"
+            class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <p class="text-xs text-slate-600 mt-1">The HTML page title is set from the fetched page title automatically.</p>
+        </div>
+        <input type="hidden" id="mId">
+        <input type="hidden" id="mOldPath">
+        <input type="hidden" id="mFetchedTitle">
+        <input type="hidden" id="mFetchedDescription">
+      </div>
+      <div class="px-6 py-4 border-t border-slate-800 flex justify-end gap-3">
+        <button onclick="closeModal()" class="px-4 py-2 text-sm text-slate-400 hover:text-white transition-colors">Cancel</button>
+        <button onclick="saveModal()" id="saveBtn"
+          class="bg-blue-600 hover:bg-blue-500 transition-colors rounded-lg px-5 py-2 text-sm font-medium">
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
 
-<button onclick="openNew()"
-class="bg-green-600 text-white px-4 py-2 rounded">
-New Link
-</button>
+  <!-- ── DELETE CONFIRM ── -->
+  <div id="deleteModal" class="hidden fixed inset-0 z-50 flex items-center justify-center px-4 modal-backdrop bg-black/60">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl w-full max-w-sm fade-in">
+      <div class="px-6 py-5">
+        <h3 class="font-semibold text-base mb-2">Delete link?</h3>
+        <p class="text-slate-400 text-sm">This will remove <span id="deletePathLabel" class="mono text-white"></span> from the JSON and delete its HTML file. This cannot be undone.</p>
+      </div>
+      <div class="px-6 py-4 border-t border-slate-800 flex justify-end gap-3">
+        <button onclick="closeDeleteModal()" class="px-4 py-2 text-sm text-slate-400 hover:text-white transition-colors">Cancel</button>
+        <button onclick="confirmDelete()" class="bg-red-600 hover:bg-red-500 transition-colors rounded-lg px-5 py-2 text-sm font-medium">Delete</button>
+      </div>
+    </div>
+  </div>
 
-<button onclick="loadLinks()"
-class="bg-gray-600 text-white px-4 py-2 rounded">
-Refresh
-</button>
-
-</div>
-
-<div id="list" class="space-y-2"></div>
-
-<div class="mt-10">
-
-<div class="flex items-center justify-between mb-3">
-<h2 class="text-xl font-semibold">Analytics Summary</h2>
-
-<button onclick="loadAnalyticsSummary()"
-class="bg-blue-600 text-white px-4 py-2 rounded">
-Refresh Analytics
-</button>
-</div>
-
-<div id="analyticsStatus" class="text-sm text-gray-600 mb-3">
-Analytics summary will load after login.
-</div>
-
-<div class="overflow-x-auto">
-
-<table class="min-w-full text-sm border">
-
-<thead class="bg-gray-50">
-<tr>
-<th class="text-left p-2 border">Path</th>
-<th class="text-left p-2 border">Total Events</th>
-<th class="text-left p-2 border">Last Seen</th>
-</tr>
-</thead>
-
-<tbody id="analyticsTable"></tbody>
-
-</table>
-</div>
-</div>
-</div>
+  <!-- ── TOAST ── -->
+  <div id="toast" class="hidden fixed bottom-5 right-5 z-50 bg-slate-800 border border-slate-700 text-white text-sm rounded-xl px-4 py-3 shadow-xl mono fade-in"></div>
 
 <script>
+/* ─── CONFIG ─── */
+const OWNER        = "thegreekdirectory";
+const REPO         = "links";
+const LINKS_JSON   = "data/links.json";
+const TEMPLATE_PATH = "_template.html";
 
-/* CONFIG */
+const SUPABASE_URL      = "https://luetekzqrrgdxtopzvqw.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1ZXRla3pxcnJnZHh0b3B6dnF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgzNDc2NDcsImV4cCI6MjA4MzkyMzY0N30.TIrNG8VGumEJc_9JvNHW-Q-UWfUGpPxR0v8POjWZJYg";
+const ANALYTICS_VIEW    = "shortlink_event_summary"; // use the pre-built view
 
-const OWNER="thegreekdirectory"
-const REPO="links"
-const LINKS_JSON="data/links.json"
-const TEMPLATE_PATH="_template.html"
-const REDIRECT_DIR=""
+let token = "";
+let links = [];
+let pendingDeleteId = null;
 
-const SUPABASE_URL="https://luetekzqrrgdxtopzvqw.supabase.co"
-const SUPABASE_ANON_KEY="YOURKEY"
-const ANALYTICS_TABLE="shortlink_events"
-
-let token=""
-let links=[]
-
-/* AUTH */
-
-function login(){
-
-token=tokenInput.value.trim()
-
-if(!token)return alert("Token required")
-
-loginBox.classList.add("hidden")
-controls.classList.remove("hidden")
-
-loadLinks()
-loadAnalyticsSummary()
-
+/* ─── AUTH ─── */
+async function login() {
+  const t = document.getElementById("tokenInput").value.trim();
+  if (!t) return showLoginError("Token is required.");
+  token = t;
+  // quick verification
+  const res = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}`, {
+    headers: { Authorization: `token ${token}` }
+  });
+  if (!res.ok) {
+    token = "";
+    return showLoginError("Invalid token or no access to repo.");
+  }
+  document.getElementById("loginScreen").classList.add("hidden");
+  document.getElementById("app").classList.remove("hidden");
+  document.getElementById("statusBadge").textContent = "connected";
+  document.getElementById("statusBadge").classList.replace("text-slate-500", "text-green-400");
+  loadLinks();
+  loadAnalyticsSummary();
 }
 
-/* HELPERS */
-
-function gh(path){
-
-return fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${path}`,{
-
-headers:{Authorization:`token ${token}`}
-
-})
-
+function showLoginError(msg) {
+  const el = document.getElementById("loginError");
+  el.textContent = msg;
+  el.classList.remove("hidden");
 }
 
-function requireValidPath(path){
-
-if(!path.startsWith("/")){
-
-alert("Path must start with /")
-return false
-
+/* ─── GITHUB HELPERS ─── */
+function gh(path) {
+  return fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${path}`, {
+    headers: { Authorization: `token ${token}` }
+  });
 }
 
-return true
-
+function filePathFromPath(path) {
+  // path = "/c/7" → "c/7.html"
+  return path.replace(/^\//, "") + ".html";
 }
 
-function requireValidURL(url){
-
-if(!url.startsWith("https://")){
-
-alert("Redirect URL must start with https://")
-return false
-
+/* ─── FETCH METADATA FROM TARGET URL ─── */
+async function fetchMetadata(url) {
+  try {
+    const res = await fetch("https://api.allorigins.win/raw?url=" + encodeURIComponent(url));
+    const html = await res.text();
+    const titleMatch = html.match(/<meta property="og:title" content="([^"]+)"/i)
+                    || html.match(/<title[^>]*>(.*?)<\/title>/is);
+    const descMatch  = html.match(/<meta property="og:description" content="([^"]+)"/i)
+                    || html.match(/<meta name="description" content="([^"]+)"/i);
+    return {
+      title:       titleMatch ? titleMatch[1].trim() : "Redirecting…",
+      description: descMatch  ? descMatch[1].trim()  : ""
+    };
+  } catch {
+    return { title: "Redirecting…", description: "" };
+  }
 }
 
-return true
-
+/* ─── LOAD LINKS ─── */
+async function loadLinks() {
+  document.getElementById("list").innerHTML =
+    `<div class="flex items-center justify-center py-10 text-slate-600 text-sm">Loading…</div>`;
+  const res  = await gh(LINKS_JSON);
+  const file = await res.json();
+  links = JSON.parse(atob(file.content)).links.filter(l => l.path && l.redirectTo);
+  render();
 }
 
-function filePathFromPath(path){
-
-return path.replace(/^\//,"")+".html"
-
+/* ─── RENDER ─── */
+function render() {
+  const q = document.getElementById("searchInput").value.toLowerCase();
+  const filtered = links.filter(l =>
+    (l.title || "").toLowerCase().includes(q) ||
+    (l.path  || "").toLowerCase().includes(q) ||
+    (l.redirectTo || "").toLowerCase().includes(q)
+  );
+  document.getElementById("linkCount").textContent = `${filtered.length} link${filtered.length !== 1 ? "s" : ""}`;
+  if (!filtered.length) {
+    document.getElementById("list").innerHTML =
+      `<div class="flex items-center justify-center py-10 text-slate-600 text-sm">No links found.</div>`;
+    return;
+  }
+  document.getElementById("list").innerHTML = filtered.map(l => `
+    <div class="flex items-center justify-between px-5 py-3 hover:bg-slate-800/40 transition-colors group">
+      <div class="min-w-0">
+        <div class="flex items-center gap-2 flex-wrap">
+          <span class="font-medium text-sm text-white truncate">${escHtml(l.title || "(no title)")}</span>
+          <span class="mono text-xs bg-slate-800 text-blue-400 rounded px-2 py-0.5 shrink-0">${escHtml(l.path)}</span>
+        </div>
+        <div class="text-xs text-slate-500 mono mt-0.5 truncate max-w-xl">${escHtml(l.redirectTo)}</div>
+      </div>
+      <div class="flex items-center gap-1 ml-4 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+        <button onclick="editLink('${l.id}')"
+          class="p-2 rounded-lg hover:bg-slate-700 text-slate-400 hover:text-blue-400 transition-colors" title="Edit">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+        </button>
+        <button onclick="deleteLink('${l.id}')"
+          class="p-2 rounded-lg hover:bg-slate-700 text-slate-400 hover:text-red-400 transition-colors" title="Delete">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+        </button>
+      </div>
+    </div>
+  `).join("");
 }
 
-/* FETCH METADATA */
-
-async function fetchMetadata(url){
-
-try{
-
-const res=await fetch("https://api.allorigins.win/raw?url="+encodeURIComponent(url))
-
-const html=await res.text()
-
-const titleMatch=html.match(/<meta property="og:title" content="([^"]+)"/i)
-|| html.match(/<title[^>]*>(.*?)<\/title>/i)
-
-const descMatch=html.match(/<meta property="og:description" content="([^"]+)"/i)
-|| html.match(/<meta name="description" content="([^"]+)"/i)
-
-return{
-
-title:titleMatch?titleMatch[1].trim():"Redirecting…",
-description:descMatch?descMatch[1].trim():""
-
+/* ─── TEMPLATE ─── */
+async function loadTemplate() {
+  const res  = await gh(TEMPLATE_PATH);
+  const file = await res.json();
+  return atob(file.content);
 }
 
-}catch{
-
-return{
-
-title:"Redirecting…",
-description:""
-
+/* ─── WRITE REDIRECT FILE ─── */
+async function writeRedirect(path, redirectTo, fetchedTitle, fetchedDescription) {
+  const filePath = filePathFromPath(path);
+  let html = await loadTemplate();
+  html = html.replaceAll("{{TITLE}}", fetchedTitle || "Redirecting…");
+  html = html.replaceAll("{{DESCRIPTION}}", fetchedDescription || "");
+  html = html.replaceAll("{{REDIRECT_URL}}", redirectTo);
+  const content = btoa(unescape(encodeURIComponent(html)));
+  let sha = null;
+  const check = await gh(filePath);
+  if (check.ok) sha = (await check.json()).sha;
+  await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${filePath}`, {
+    method: "PUT",
+    headers: { Authorization: `token ${token}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ message: `Write redirect: ${path}`, content, ...(sha && { sha }) })
+  });
 }
 
+/* ─── DELETE REDIRECT FILE ─── */
+async function deleteRedirectFile(path) {
+  const filePath = filePathFromPath(path);
+  const check = await gh(filePath);
+  if (!check.ok) return;
+  const { sha } = await check.json();
+  await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${filePath}`, {
+    method: "DELETE",
+    headers: { Authorization: `token ${token}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ message: `Delete redirect: ${path}`, sha })
+  });
 }
 
+/* ─── SAVE JSON ─── */
+async function saveJSON(message = "Update links.json") {
+  const res  = await gh(LINKS_JSON);
+  const file = await res.json();
+  await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${LINKS_JSON}`, {
+    method: "PUT",
+    headers: { Authorization: `token ${token}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      message,
+      content: btoa(unescape(encodeURIComponent(JSON.stringify({ links }, null, 2)))),
+      sha: file.sha
+    })
+  });
+  await loadLinks();
 }
 
-/* LOAD LINKS */
-
-async function loadLinks(){
-
-const res=await gh(LINKS_JSON)
-const file=await res.json()
-
-links=JSON.parse(atob(file.content)).links
-
-render()
-
+/* ─── MODAL: NEW ─── */
+function openNew() {
+  document.getElementById("modalTitle").textContent = "New Link";
+  document.getElementById("mId").value       = "";
+  document.getElementById("mOldPath").value  = "";
+  document.getElementById("mRedirectTo").value = "";
+  document.getElementById("mPath").value     = "";
+  document.getElementById("mTitle").value    = "";
+  document.getElementById("mFetchedTitle").value = "";
+  document.getElementById("mFetchedDescription").value = "";
+  document.getElementById("metaStatus").classList.add("hidden");
+  document.getElementById("modal").classList.remove("hidden");
 }
 
-/* RENDER */
-
-function render(){
-
-const q=searchInput.value.toLowerCase()
-
-list.innerHTML=""
-
-links.filter(l=>
-
-(l.title||"").toLowerCase().includes(q) ||
-(l.path||"").toLowerCase().includes(q) ||
-(l.redirectTo||"").toLowerCase().includes(q)
-
-).forEach(l=>{
-
-list.innerHTML+=`
-
-<div class="border rounded p-3 flex justify-between items-center">
-
-<div>
-
-<div class="font-semibold">${l.title||"(no title)"}</div>
-
-<div class="text-sm text-gray-600">
-${l.path} → ${l.redirectTo}
-</div>
-
-</div>
-
-<div class="space-x-3">
-
-<button onclick="editLink('${l.id}')" class="text-blue-600">Edit</button>
-<button onclick="deleteLink('${l.id}')" class="text-red-600">Delete</button>
-
-</div>
-
-</div>
-
-`
-
-})
-
+/* ─── MODAL: EDIT ─── */
+function editLink(id) {
+  const l = links.find(x => x.id === id);
+  if (!l) return;
+  document.getElementById("modalTitle").textContent = "Edit Link";
+  document.getElementById("mId").value       = l.id;
+  document.getElementById("mOldPath").value  = l.path;
+  document.getElementById("mRedirectTo").value = l.redirectTo;
+  document.getElementById("mPath").value     = l.path;
+  document.getElementById("mTitle").value    = l.title || "";
+  document.getElementById("mFetchedTitle").value = l.fetchedTitle || "";
+  document.getElementById("mFetchedDescription").value = l.fetchedDescription || "";
+  document.getElementById("metaStatus").classList.add("hidden");
+  document.getElementById("modal").classList.remove("hidden");
 }
 
-/* TEMPLATE */
-
-async function loadTemplate(){
-
-const res=await gh(TEMPLATE_PATH)
-const file=await res.json()
-
-return atob(file.content)
-
+function closeModal() {
+  document.getElementById("modal").classList.add("hidden");
 }
 
-/* WRITE REDIRECT */
-
-async function writeRedirect(path,redirectTo){
-
-const filePath=filePathFromPath(path)
-
-let html=await loadTemplate()
-
-const meta=await fetchMetadata(redirectTo)
-
-html=html.replaceAll("{{TITLE}}",meta.title)
-html=html.replaceAll("{{DESCRIPTION}}",meta.description)
-html=html.replaceAll("{{REDIRECT_URL}}",redirectTo)
-
-const content=btoa(html)
-
-let sha=null
-
-const check=await gh(filePath)
-
-if(check.ok)sha=(await check.json()).sha
-
-await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${filePath}`,{
-
-method:"PUT",
-
-headers:{
-
-Authorization:`token ${token}`,
-"Content-Type":"application/json"
-
-},
-
-body:JSON.stringify({
-
-message:"Write redirect page",
-content,
-...(sha&&{sha})
-
-})
-
-})
-
+/* ─── MODAL: FETCH META ─── */
+async function fetchMeta() {
+  const url = document.getElementById("mRedirectTo").value.trim();
+  if (!url.startsWith("https://")) return showMetaStatus("URL must start with https://", "error");
+  const btn = document.getElementById("fetchBtn");
+  btn.textContent = "Fetching…";
+  btn.disabled = true;
+  showMetaStatus("Fetching metadata…", "info");
+  const meta = await fetchMetadata(url);
+  document.getElementById("mFetchedTitle").value = meta.title;
+  document.getElementById("mFetchedDescription").value = meta.description;
+  if (!document.getElementById("mTitle").value) {
+    document.getElementById("mTitle").value = meta.title;
+  }
+  showMetaStatus(`Fetched: "${meta.title}"`, "ok");
+  btn.textContent = "Fetch Meta";
+  btn.disabled = false;
 }
 
-/* SAVE JSON */
-
-async function saveJSON(){
-
-const res=await gh(LINKS_JSON)
-const file=await res.json()
-
-await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${LINKS_JSON}`,{
-
-method:"PUT",
-
-headers:{
-
-Authorization:`token ${token}`,
-"Content-Type":"application/json"
-
-},
-
-body:JSON.stringify({
-
-message:"Update links.json",
-content:btoa(JSON.stringify({links},null,2)),
-sha:file.sha
-
-})
-
-})
-
-loadLinks()
-
+function showMetaStatus(msg, type) {
+  const el = document.getElementById("metaStatus");
+  el.textContent = msg;
+  el.className = "text-xs mt-1 " + { error: "text-red-400", ok: "text-green-400", info: "text-slate-500" }[type];
+  el.classList.remove("hidden");
 }
 
-/* CRUD */
+/* ─── MODAL: SAVE ─── */
+async function saveModal() {
+  const id          = document.getElementById("mId").value;
+  const oldPath     = document.getElementById("mOldPath").value;
+  const redirectTo  = document.getElementById("mRedirectTo").value.trim();
+  const path        = document.getElementById("mPath").value.trim();
+  const title       = document.getElementById("mTitle").value.trim();
+  let fetchedTitle  = document.getElementById("mFetchedTitle").value.trim();
+  let fetchedDesc   = document.getElementById("mFetchedDescription").value.trim();
 
-async function openNew(){
+  if (!path.startsWith("/"))    return toast("Path must start with /", "error");
+  if (!redirectTo.startsWith("https://")) return toast("Redirect URL must start with https://", "error");
 
-const redirectTo=prompt("Redirect URL (https://...)")
+  // If no fetched meta yet, go get it
+  if (!fetchedTitle) {
+    toast("Fetching page metadata…", "info");
+    const meta = await fetchMetadata(redirectTo);
+    fetchedTitle = meta.title;
+    fetchedDesc  = meta.description;
+  }
 
-if(!redirectTo)return
+  const saveBtn = document.getElementById("saveBtn");
+  saveBtn.textContent = "Saving…";
+  saveBtn.disabled = true;
 
-if(!requireValidURL(redirectTo))return
-
-const meta=await fetchMetadata(redirectTo)
-
-const title=prompt("Title",meta.title)
-const path=prompt("Path (/anything)")
-
-if(!title||!path)return
-
-if(!requireValidPath(path))return
-
-const link={
-
-id:crypto.randomUUID(),
-title,
-path,
-redirectTo
-
+  try {
+    if (id) {
+      // EDIT — if path changed, delete old file
+      if (oldPath && oldPath !== path) await deleteRedirectFile(oldPath);
+      const idx = links.findIndex(l => l.id === id);
+      if (idx !== -1) {
+        links[idx] = { id, title: title || fetchedTitle, path, redirectTo, fetchedTitle, fetchedDescription: fetchedDesc };
+      }
+    } else {
+      // NEW
+      links.push({ id: crypto.randomUUID(), title: title || fetchedTitle, path, redirectTo, fetchedTitle, fetchedDescription: fetchedDesc });
+    }
+    await writeRedirect(path, redirectTo, fetchedTitle, fetchedDesc);
+    await saveJSON(id ? `Edit link: ${path}` : `Add link: ${path}`);
+    closeModal();
+    toast(`Link saved: ${path}`, "ok");
+  } catch(e) {
+    toast("Save failed: " + e.message, "error");
+  } finally {
+    saveBtn.textContent = "Save";
+    saveBtn.disabled = false;
+  }
 }
 
-links.push(link)
-
-await writeRedirect(path,redirectTo)
-
-await saveJSON()
-
+/* ─── DELETE ─── */
+function deleteLink(id) {
+  const l = links.find(x => x.id === id);
+  if (!l) return;
+  pendingDeleteId = id;
+  document.getElementById("deletePathLabel").textContent = l.path;
+  document.getElementById("deleteModal").classList.remove("hidden");
 }
 
-/* ANALYTICS */
-
-function formatTimestamp(value){
-
-if(!value)return "—"
-
-const date=new Date(value)
-
-if(Number.isNaN(date.getTime()))return value
-
-return date.toLocaleString()
-
+function closeDeleteModal() {
+  pendingDeleteId = null;
+  document.getElementById("deleteModal").classList.add("hidden");
 }
 
-async function loadAnalyticsSummary(){
-
-analyticsStatus.textContent="Loading analytics summary..."
-
-analyticsTable.innerHTML=""
-
-const url=new URL(`${SUPABASE_URL}/rest/v1/${ANALYTICS_TABLE}`)
-
-url.searchParams.set("select","path,count:count(),last_seen:max(event_time)")
-url.searchParams.set("group","path")
-url.searchParams.set("order","last_seen.desc")
-
-try{
-
-const res=await fetch(url.toString(),{
-
-headers:{
-
-apikey:SUPABASE_ANON_KEY,
-Authorization:`Bearer ${SUPABASE_ANON_KEY}`
-
+async function confirmDelete() {
+  const l = links.find(x => x.id === pendingDeleteId);
+  if (!l) return closeDeleteModal();
+  closeDeleteModal();
+  toast("Deleting…", "info");
+  try {
+    await deleteRedirectFile(l.path);
+    links = links.filter(x => x.id !== pendingDeleteId);
+    await saveJSON(`Delete link: ${l.path}`);
+    toast(`Deleted: ${l.path}`, "ok");
+  } catch(e) {
+    toast("Delete failed: " + e.message, "error");
+  }
+  pendingDeleteId = null;
 }
 
-})
-
-if(!res.ok)throw new Error()
-
-const data=await res.json()
-
-if(!data.length){
-
-analyticsStatus.textContent="No analytics events yet."
-return
-
+/* ─── IMPORT CSV ─── */
+// Expected CSV format: path,redirectTo,title(optional)
+function importCSV() {
+  const file = document.getElementById("csvInput").files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    const rows = e.target.result.trim().split("\n").slice(1); // skip header
+    let count = 0;
+    for (const row of rows) {
+      const cols = row.split(",").map(c => c.trim().replace(/^"|"$/g, ""));
+      const [path, redirectTo, title] = cols;
+      if (!path || !redirectTo) continue;
+      if (!path.startsWith("/") || !redirectTo.startsWith("https://")) continue;
+      const existing = links.find(l => l.path === path);
+      if (existing) continue; // skip duplicates
+      const meta = await fetchMetadata(redirectTo);
+      links.push({
+        id: crypto.randomUUID(),
+        title: title || meta.title,
+        path,
+        redirectTo,
+        fetchedTitle: meta.title,
+        fetchedDescription: meta.description
+      });
+      await writeRedirect(path, redirectTo, meta.title, meta.description);
+      count++;
+    }
+    if (count > 0) {
+      await saveJSON(`Import ${count} links via CSV`);
+      toast(`Imported ${count} link${count !== 1 ? "s" : ""}`, "ok");
+    } else {
+      toast("No new links found in CSV.", "info");
+    }
+    document.getElementById("csvInput").value = "";
+  };
+  reader.readAsText(file);
 }
 
-const totalEvents=data.reduce((sum,i)=>sum+Number(i.count||0),0)
-
-analyticsStatus.textContent=`Loaded ${totalEvents} events across ${data.length} paths.`
-
-analyticsTable.innerHTML=data.map(item=>`
-
-<tr>
-<td class="p-2 border font-mono text-xs">${item.path}</td>
-<td class="p-2 border">${item.count}</td>
-<td class="p-2 border">${formatTimestamp(item.last_seen)}</td>
-</tr>
-
-`).join("")
-
-}catch{
-
-analyticsStatus.textContent="Failed to load analytics summary."
-
+/* ─── ANALYTICS ─── */
+function formatTimestamp(value) {
+  if (!value) return "—";
+  const d = new Date(value);
+  return isNaN(d) ? value : d.toLocaleString();
 }
 
+async function loadAnalyticsSummary() {
+  const statusEl = document.getElementById("analyticsStatus");
+  const tableEl  = document.getElementById("analyticsTable");
+  statusEl.textContent = "Loading…";
+  statusEl.classList.remove("hidden");
+  tableEl.innerHTML = "";
+
+  // Query the pre-built summary VIEW (fixes the invalid ?group= param bug)
+  const url = `${SUPABASE_URL}/rest/v1/${ANALYTICS_VIEW}?select=path,total_events,last_seen&order=last_seen.desc`;
+  try {
+    const res = await fetch(url, {
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` }
+    });
+    if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+    const data = await res.json();
+    if (!data.length) {
+      statusEl.textContent = "No analytics events yet.";
+      tableEl.innerHTML = `<tr><td colspan="3" class="px-5 py-8 text-center text-slate-600 text-sm">No events recorded yet.</td></tr>`;
+      return;
+    }
+    const total = data.reduce((s, i) => s + Number(i.total_events || 0), 0);
+    statusEl.textContent = `${total.toLocaleString()} total events · ${data.length} paths`;
+    tableEl.innerHTML = data.map(row => `
+      <tr class="hover:bg-slate-800/30 transition-colors">
+        <td class="px-5 py-3 mono text-xs text-blue-400">${escHtml(row.path)}</td>
+        <td class="px-5 py-3 text-sm font-medium">${Number(row.total_events).toLocaleString()}</td>
+        <td class="px-5 py-3 text-sm text-slate-400">${formatTimestamp(row.last_seen)}</td>
+      </tr>
+    `).join("");
+  } catch(e) {
+    statusEl.textContent = `Failed to load analytics: ${e.message}`;
+    tableEl.innerHTML = `<tr><td colspan="3" class="px-5 py-8 text-center text-red-500 text-sm">Error loading analytics.</td></tr>`;
+  }
 }
 
-searchInput.addEventListener("input",render)
+/* ─── TOAST ─── */
+function toast(msg, type = "info") {
+  const el = document.getElementById("toast");
+  const colors = { ok: "border-green-500 text-green-400", error: "border-red-500 text-red-400", info: "border-slate-600 text-slate-300" };
+  el.className = `fixed bottom-5 right-5 z-50 bg-slate-800 border text-sm rounded-xl px-4 py-3 shadow-xl mono fade-in ${colors[type]}`;
+  el.textContent = msg;
+  el.classList.remove("hidden");
+  clearTimeout(el._timer);
+  el._timer = setTimeout(() => el.classList.add("hidden"), 3500);
+}
 
+/* ─── UTILS ─── */
+function escHtml(str) {
+  return String(str ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+/* ─── EVENTS ─── */
+document.getElementById("searchInput").addEventListener("input", render);
+document.getElementById("tokenInput").addEventListener("keydown", e => e.key === "Enter" && login());
+document.getElementById("modal").addEventListener("click", e => { if (e.target === document.getElementById("modal")) closeModal(); });
+document.getElementById("deleteModal").addEventListener("click", e => { if (e.target === document.getElementById("deleteModal")) closeDeleteModal(); });
 </script>
-
 </body>
 </html>
