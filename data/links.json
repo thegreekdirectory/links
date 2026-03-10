@@ -101,6 +101,14 @@
       "title": "f",
       "path": "/s",
       "redirectTo": "https://example.com"
+    },
+    {
+      "id": "a4fd8909-cf29-4068-b724-79f063eae7f8",
+      "title": "ReportBug",
+      "path": "/bug",
+      "redirectTo": "https://forms.gle/1zaLR8PCajgoV3ej9",
+      "fetchedTitle": "Redirecting…",
+      "fetchedDescription": ""
     }
   ]
 }
