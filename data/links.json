@@ -109,15 +109,15 @@
       "title": "GENERAL: Report Bug",
       "path": "/bug",
       "redirectTo": "https://forms.gle/1zaLR8PCajgoV3ej9",
-      "fetchedTitle": "RedirectingÃÂ¢ÃÂÃÂ¦",
+      "fetchedTitle": "RedirectingÃÂÃÂ¢ÃÂÃÂÃÂÃÂ¦",
       "fetchedDescription": ""
     },
     {
       "id": "1abfe582-5e97-49d6-85ad-b808082dc6af",
-      "title": "Contact",
+      "title": "GENERAL: Contact",
       "path": "/contact",
       "redirectTo": "https://thegreekdirectory.org/contact",
-      "fetchedTitle": "RedirectingÃ¢ÂÂ¦",
+      "fetchedTitle": "RedirectingÃÂ¢ÃÂÃÂ¦",
       "fetchedDescription": ""
     }
   ]
