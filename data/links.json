@@ -106,10 +106,10 @@
     },
     {
       "id": "a4fd8909-cf29-4068-b724-79f063eae7f8",
-      "title": "ReportBug",
+      "title": "GENERAL: Report Bug",
       "path": "/bug",
       "redirectTo": "https://forms.gle/1zaLR8PCajgoV3ej9",
-      "fetchedTitle": "RedirectingÃ¢ÂÂ¦",
+      "fetchedTitle": "RedirectingÃÂ¢ÃÂÃÂ¦",
       "fetchedDescription": ""
     },
     {
@@ -117,7 +117,7 @@
       "title": "Contact",
       "path": "/contact",
       "redirectTo": "https://thegreekdirectory.org/contact",
-      "fetchedTitle": "Redirectingâ¦",
+      "fetchedTitle": "RedirectingÃ¢ÂÂ¦",
       "fetchedDescription": ""
     }
   ]
