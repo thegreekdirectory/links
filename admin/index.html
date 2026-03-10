@@ -59,6 +59,11 @@
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
         New Link
       </button>
+      <button onclick="generateAll()"
+        class="bg-amber-600 hover:bg-amber-500 transition-colors rounded-lg px-4 py-2 text-sm font-medium flex items-center gap-2">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        Generate All
+      </button>
       <button onclick="loadLinks()"
         class="bg-slate-800 hover:bg-slate-700 transition-colors border border-slate-700 rounded-lg px-4 py-2 text-sm font-medium flex items-center gap-2">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
@@ -163,6 +168,29 @@
       <div class="px-6 py-4 border-t border-slate-800 flex justify-end gap-3">
         <button onclick="closeDeleteModal()" class="px-4 py-2 text-sm text-slate-400 hover:text-white transition-colors">Cancel</button>
         <button onclick="confirmDelete()" class="bg-red-600 hover:bg-red-500 transition-colors rounded-lg px-5 py-2 text-sm font-medium">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── GENERATE PROGRESS MODAL ── -->
+  <div id="genModal" class="hidden fixed inset-0 z-50 flex items-center justify-center px-4 modal-backdrop bg-black/60">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl w-full max-w-sm fade-in">
+      <div class="px-6 py-5 space-y-4">
+        <div class="flex items-center gap-3">
+          <span id="genSpinner" class="inline-block w-5 h-5 border-2 border-amber-500 border-t-transparent rounded-full animate-spin"></span>
+          <h3 class="font-semibold text-base" id="genModalTitle">Generating…</h3>
+        </div>
+        <!-- progress bar -->
+        <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+          <div id="genBar" class="h-full bg-amber-500 rounded-full transition-all duration-300" style="width:0%"></div>
+        </div>
+        <!-- current item -->
+        <p id="genCurrent" class="text-xs mono text-slate-400 truncate">Starting…</p>
+        <!-- results log -->
+        <div id="genLog" class="max-h-40 overflow-y-auto space-y-1 text-xs mono"></div>
+      </div>
+      <div class="px-6 py-4 border-t border-slate-800 flex justify-end">
+        <button id="genDoneBtn" onclick="closeGenModal()" class="hidden bg-slate-700 hover:bg-slate-600 transition-colors rounded-lg px-5 py-2 text-sm font-medium">Done</button>
       </div>
     </div>
   </div>
@@ -276,6 +304,11 @@ function render() {
         <div class="text-xs text-slate-500 mono mt-0.5 truncate max-w-xl">${escHtml(l.redirectTo)}</div>
       </div>
       <div class="flex items-center gap-1 ml-4 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+        <button onclick="generateOne('${l.id}')"
+          id="gen-${l.id}"
+          class="p-2 rounded-lg hover:bg-slate-700 text-slate-400 hover:text-amber-400 transition-colors" title="Regenerate HTML file">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        </button>
         <button onclick="editLink('${l.id}')"
           class="p-2 rounded-lg hover:bg-slate-700 text-slate-400 hover:text-blue-400 transition-colors" title="Edit">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
@@ -521,6 +554,106 @@ function importCSV() {
   reader.readAsText(file);
 }
 
+/* ─── GENERATE SINGLE ─── */
+async function generateOne(id) {
+  const l = links.find(x => x.id === id);
+  if (!l) return;
+  const btn = document.getElementById(`gen-${id}`);
+  if (btn) {
+    btn.innerHTML = `<svg class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>`;
+    btn.disabled = true;
+  }
+  try {
+    toast(`Fetching metadata for ${l.path}…`, "info");
+    const meta = await fetchMetadata(l.redirectTo);
+    await writeRedirect(l.path, l.redirectTo, meta.title, meta.description);
+    // persist fetched meta back into the JSON
+    const idx = links.findIndex(x => x.id === id);
+    if (idx !== -1) {
+      links[idx] = { ...links[idx], fetchedTitle: meta.title, fetchedDescription: meta.description };
+    }
+    await saveJSON(`Regenerate: ${l.path}`);
+    toast(`Generated ${l.path}`, "ok");
+  } catch(e) {
+    toast(`Failed: ${e.message}`, "error");
+  } finally {
+    if (btn) {
+      btn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>`;
+      btn.disabled = false;
+    }
+  }
+}
+
+/* ─── GENERATE ALL ─── */
+async function generateAll() {
+  if (!links.length) return toast("No links to generate.", "info");
+
+  // open modal
+  const modal    = document.getElementById("genModal");
+  const titleEl  = document.getElementById("genModalTitle");
+  const barEl    = document.getElementById("genBar");
+  const curEl    = document.getElementById("genCurrent");
+  const logEl    = document.getElementById("genLog");
+  const doneBtn  = document.getElementById("genDoneBtn");
+  const spinner  = document.getElementById("genSpinner");
+
+  titleEl.textContent = `Generating ${links.length} link${links.length !== 1 ? "s" : ""}…`;
+  barEl.style.width   = "0%";
+  curEl.textContent   = "Starting…";
+  logEl.innerHTML     = "";
+  doneBtn.classList.add("hidden");
+  spinner.classList.remove("hidden");
+  modal.classList.remove("hidden");
+
+  let done = 0, succeeded = 0, failed = 0;
+
+  function addLog(path, status, note) {
+    const colors = { ok: "text-green-400", error: "text-red-400", skip: "text-slate-500" };
+    const icons  = { ok: "✓", error: "✗", skip: "–" };
+    const row = document.createElement("div");
+    row.className = `flex items-center gap-2 ${colors[status]}`;
+    row.innerHTML = `<span>${icons[status]}</span><span class="text-slate-300 truncate max-w-[160px]">${escHtml(path)}</span><span class="text-slate-500 truncate">${escHtml(note)}</span>`;
+    logEl.appendChild(row);
+    logEl.scrollTop = logEl.scrollHeight;
+  }
+
+  for (const l of links) {
+    curEl.textContent = l.path;
+    try {
+      const meta = await fetchMetadata(l.redirectTo);
+      await writeRedirect(l.path, l.redirectTo, meta.title, meta.description);
+      // update in-memory meta
+      const idx = links.findIndex(x => x.id === l.id);
+      if (idx !== -1) {
+        links[idx] = { ...links[idx], fetchedTitle: meta.title, fetchedDescription: meta.description };
+      }
+      addLog(l.path, "ok", meta.title || "—");
+      succeeded++;
+    } catch(e) {
+      addLog(l.path, "error", e.message);
+      failed++;
+    }
+    done++;
+    barEl.style.width = `${Math.round((done / links.length) * 100)}%`;
+  }
+
+  // persist all updated meta to JSON in one shot
+  try {
+    await saveJSON(`Regenerate all ${links.length} links`);
+  } catch(e) {
+    addLog("links.json", "error", "Failed to save JSON: " + e.message);
+  }
+
+  titleEl.textContent = `Done — ${succeeded} generated${failed ? `, ${failed} failed` : ""}`;
+  curEl.textContent   = "";
+  spinner.classList.add("hidden");
+  doneBtn.classList.remove("hidden");
+}
+
+function closeGenModal() {
+  document.getElementById("genModal").classList.add("hidden");
+}
+
 /* ─── ANALYTICS ─── */
 function formatTimestamp(value) {
   if (!value) return "—";
@@ -584,6 +717,7 @@ document.getElementById("searchInput").addEventListener("input", render);
 document.getElementById("tokenInput").addEventListener("keydown", e => e.key === "Enter" && login());
 document.getElementById("modal").addEventListener("click", e => { if (e.target === document.getElementById("modal")) closeModal(); });
 document.getElementById("deleteModal").addEventListener("click", e => { if (e.target === document.getElementById("deleteModal")) closeDeleteModal(); });
+document.getElementById("genModal").addEventListener("click", e => { if (e.target === document.getElementById("genModal") && !document.getElementById("genDoneBtn").classList.contains("hidden")) closeGenModal(); });
 </script>
 </body>
 </html>
