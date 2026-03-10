@@ -1,12 +1,6 @@
 {
   "links": [
     {
-      "id": "5489d898-0f02-42ef-b7fe-4d178d9374e6",
-      "title": null,
-      "path": null,
-      "redirectTo": null
-    },
-    {
       "id": "0621d711-8eb3-433f-941c-5d70ff0a6ad8",
       "title": "FILTERS: Categories - Beauty & Health",
       "path": "/c/2",
@@ -25,6 +19,12 @@
       "redirectTo": "https://www.thegreekdirectory.org/listings?category=Cultural%2FFraternal+Organization"
     },
     {
+      "id": "1d4c4e19-db74-4e3e-a5b7-5a70385b93ef",
+      "title": "FILTERS: Categories - Education & Community",
+      "path": "/c/5",
+      "redirectTo": "https://www.thegreekdirectory.org/listings?category=Education+%26+Community"
+    },
+    {
       "id": "ebf47ffd-1f54-4b58-afa8-bee321b81b10",
       "title": "FILTERS: Categories - Entertainment, Arts & Recreation",
       "path": "/c/6",
@@ -41,12 +41,6 @@
       "title": "FILTERS: Categories - Grocery & Imports",
       "path": "/c/8",
       "redirectTo": "https://www.thegreekdirectory.org/listings?category=Grocery+%26+Imports"
-    },
-    {
-      "id": "1d4c4e19-db74-4e3e-a5b7-5a70385b93ef",
-      "title": "FILTERS: Categories - Education & Community",
-      "path": "/c/5",
-      "redirectTo": "https://www.thegreekdirectory.org/listings?category=Education+%26+Community"
     },
     {
       "id": "fec7fead-fe18-4139-9242-2854d9995d1a",
@@ -85,6 +79,12 @@
       "redirectTo": "https://www.thegreekdirectory.org/listings?category=Retail+%26+Shopping"
     },
     {
+      "id": "985a561d-ef42-49a3-bec2-eb7d51c26be0",
+      "title": "Download App",
+      "path": "/app",
+      "redirectTo": "https://thegreekdirectory.org/app"
+    },
+    {
       "id": "8b9f408e-24e4-40ca-b4a3-3a45feabcf8d",
       "title": "Google",
       "path": "/google",
@@ -97,34 +97,10 @@
       "redirectTo": "https://docs.example.com/api"
     },
     {
-      "id": "be6078e8-05f5-4c26-a008-24a7978e70b9",
-      "title": "App",
-      "path": "/app",
-      "redirectTo": "https://thegreekdirectory.org/app"
-    },
-    {
-      "id": "487c7a9d-7bfd-4c23-bf03-79a17320a9e7",
-      "title": "Google",
-      "path": "/google",
-      "redirectTo": "https://google.com"
-    },
-    {
-      "id": "2605c0b1-34a9-49b2-a65f-ea7f54500984",
-      "title": "Docs",
-      "path": "/docs/api",
-      "redirectTo": "https://docs.example.com/api"
-    },
-    {
       "id": "babc1e8c-6898-42a9-9fdb-1c2f020d0479",
       "title": "f",
       "path": "/s",
       "redirectTo": "https://example.com"
-    },
-    {
-      "id": "985a561d-ef42-49a3-bec2-eb7d51c26be0",
-      "title": "Download App",
-      "path": "/app",
-      "redirectTo": "https://thegreekdirectory.org/app"
     }
   ]
 }
