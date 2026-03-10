@@ -200,32 +200,30 @@
 
 <script>
 /* ─── CONFIG ─── */
-const OWNER        = "thegreekdirectory";
-const REPO         = "links";
-const LINKS_JSON   = "data/links.json";
-const TEMPLATE_PATH = "_template.html";
+const OWNER         = "thegreekdirectory";
+const REPO          = "links";
+const TEMPLATE_PATH = "_template.html";       // still on GitHub for generating HTML files
 
 const SUPABASE_URL      = "https://luetekzqrrgdxtopzvqw.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1ZXRla3pxcnJnZHh0b3B6dnF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgzNDc2NDcsImV4cCI6MjA4MzkyMzY0N30.TIrNG8VGumEJc_9JvNHW-Q-UWfUGpPxR0v8POjWZJYg";
-const ANALYTICS_VIEW    = "shortlink_event_summary"; // use the pre-built view
+const SHORTLINKS_TABLE  = "shortlinks";
+const ANALYTICS_VIEW    = "shortlink_event_summary";
 
 let token = "";
-let links = [];
+let links = [];           // rows from Supabase; snake_case columns
 let pendingDeleteId = null;
 
-/* ─── AUTH ─── */
+/* ══════════════════════════════════════════
+   AUTH
+══════════════════════════════════════════ */
 async function login() {
   const t = document.getElementById("tokenInput").value.trim();
   if (!t) return showLoginError("Token is required.");
   token = t;
-  // quick verification
   const res = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}`, {
     headers: { Authorization: `token ${token}` }
   });
-  if (!res.ok) {
-    token = "";
-    return showLoginError("Invalid token or no access to repo.");
-  }
+  if (!res.ok) { token = ""; return showLoginError("Invalid token or no access to repo."); }
   document.getElementById("loginScreen").classList.add("hidden");
   document.getElementById("app").classList.remove("hidden");
   document.getElementById("statusBadge").textContent = "connected";
@@ -240,7 +238,61 @@ function showLoginError(msg) {
   el.classList.remove("hidden");
 }
 
-/* ─── GITHUB HELPERS ─── */
+/* ══════════════════════════════════════════
+   SUPABASE HELPERS
+   All link data now lives in the `shortlinks`
+   table. GitHub is only used for HTML files.
+══════════════════════════════════════════ */
+function sbHeaders(extra = {}) {
+  return {
+    apikey:        SUPABASE_ANON_KEY,
+    Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+    "Content-Type": "application/json",
+    Prefer:        "return=representation",
+    ...extra
+  };
+}
+
+async function sbSelect(params = "") {
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/${SHORTLINKS_TABLE}${params}`,
+    { headers: sbHeaders() }
+  );
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+async function sbInsert(row) {
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/${SHORTLINKS_TABLE}`,
+    { method: "POST", headers: sbHeaders(), body: JSON.stringify(row) }
+  );
+  if (!res.ok) throw new Error(await res.text());
+  const data = await res.json();
+  return Array.isArray(data) ? data[0] : data;
+}
+
+async function sbUpdate(id, patch) {
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/${SHORTLINKS_TABLE}?id=eq.${encodeURIComponent(id)}`,
+    { method: "PATCH", headers: sbHeaders(), body: JSON.stringify(patch) }
+  );
+  if (!res.ok) throw new Error(await res.text());
+  const data = await res.json();
+  return Array.isArray(data) ? data[0] : data;
+}
+
+async function sbDelete(id) {
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/${SHORTLINKS_TABLE}?id=eq.${encodeURIComponent(id)}`,
+    { method: "DELETE", headers: sbHeaders({ Prefer: "return=minimal" }) }
+  );
+  if (!res.ok) throw new Error(await res.text());
+}
+
+/* ══════════════════════════════════════════
+   GITHUB HELPERS  (HTML files only)
+══════════════════════════════════════════ */
 function gh(path) {
   return fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${path}`, {
     headers: { Authorization: `token ${token}` }
@@ -248,14 +300,50 @@ function gh(path) {
 }
 
 function filePathFromPath(path) {
-  // path = "/c/7" → "c/7.html"
-  return path.replace(/^\//, "") + ".html";
+  return path.replace(/^\//, "") + ".html";   // "/c/7" → "c/7.html"
 }
 
-/* ─── FETCH METADATA FROM TARGET URL ─── */
+async function loadTemplate() {
+  const res  = await gh(TEMPLATE_PATH);
+  const file = await res.json();
+  return atob(file.content);
+}
+
+async function writeRedirect(path, redirectTo, fetchedTitle, fetchedDescription) {
+  const filePath = filePathFromPath(path);
+  let html = await loadTemplate();
+  html = html.replaceAll("{{TITLE}}",        fetchedTitle        || "Redirecting…");
+  html = html.replaceAll("{{DESCRIPTION}}", fetchedDescription  || "");
+  html = html.replaceAll("{{REDIRECT_URL}}", redirectTo);
+  const content = btoa(unescape(encodeURIComponent(html)));
+  let sha = null;
+  const check = await gh(filePath);
+  if (check.ok) sha = (await check.json()).sha;
+  await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${filePath}`, {
+    method: "PUT",
+    headers: { Authorization: `token ${token}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ message: `Write redirect: ${path}`, content, ...(sha && { sha }) })
+  });
+}
+
+async function deleteRedirectFile(path) {
+  const filePath = filePathFromPath(path);
+  const check = await gh(filePath);
+  if (!check.ok) return;
+  const { sha } = await check.json();
+  await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${filePath}`, {
+    method: "DELETE",
+    headers: { Authorization: `token ${token}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ message: `Delete redirect: ${path}`, sha })
+  });
+}
+
+/* ══════════════════════════════════════════
+   METADATA SCRAPER
+══════════════════════════════════════════ */
 async function fetchMetadata(url) {
   try {
-    const res = await fetch("https://api.allorigins.win/raw?url=" + encodeURIComponent(url));
+    const res  = await fetch("https://api.allorigins.win/raw?url=" + encodeURIComponent(url));
     const html = await res.text();
     const titleMatch = html.match(/<meta property="og:title" content="([^"]+)"/i)
                     || html.match(/<title[^>]*>(.*?)<\/title>/is);
@@ -270,23 +358,32 @@ async function fetchMetadata(url) {
   }
 }
 
-/* ─── LOAD LINKS ─── */
+/* ══════════════════════════════════════════
+   LOAD LINKS  (from Supabase)
+══════════════════════════════════════════ */
 async function loadLinks() {
   document.getElementById("list").innerHTML =
     `<div class="flex items-center justify-center py-10 text-slate-600 text-sm">Loading…</div>`;
-  const res  = await gh(LINKS_JSON);
-  const file = await res.json();
-  links = JSON.parse(atob(file.content)).links.filter(l => l.path && l.redirectTo);
-  render();
+  try {
+    links = await sbSelect("?select=*&order=created_at.asc");
+    render();
+  } catch(e) {
+    document.getElementById("list").innerHTML =
+      `<div class="flex items-center justify-center py-10 text-red-500 text-sm">Failed to load: ${escHtml(e.message)}</div>`;
+  }
 }
 
-/* ─── RENDER ─── */
+/* ══════════════════════════════════════════
+   RENDER
+   Supabase columns: id, title, path,
+   redirect_to, fetched_title, fetched_description
+══════════════════════════════════════════ */
 function render() {
   const q = document.getElementById("searchInput").value.toLowerCase();
   const filtered = links.filter(l =>
-    (l.title || "").toLowerCase().includes(q) ||
-    (l.path  || "").toLowerCase().includes(q) ||
-    (l.redirectTo || "").toLowerCase().includes(q)
+    (l.title        || "").toLowerCase().includes(q) ||
+    (l.path         || "").toLowerCase().includes(q) ||
+    (l.redirect_to  || "").toLowerCase().includes(q)
   );
   document.getElementById("linkCount").textContent = `${filtered.length} link${filtered.length !== 1 ? "s" : ""}`;
   if (!filtered.length) {
@@ -301,11 +398,10 @@ function render() {
           <span class="font-medium text-sm text-white truncate">${escHtml(l.title || "(no title)")}</span>
           <span class="mono text-xs bg-slate-800 text-blue-400 rounded px-2 py-0.5 shrink-0">${escHtml(l.path)}</span>
         </div>
-        <div class="text-xs text-slate-500 mono mt-0.5 truncate max-w-xl">${escHtml(l.redirectTo)}</div>
+        <div class="text-xs text-slate-500 mono mt-0.5 truncate max-w-xl">${escHtml(l.redirect_to)}</div>
       </div>
       <div class="flex items-center gap-1 ml-4 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-        <button onclick="generateOne('${l.id}')"
-          id="gen-${l.id}"
+        <button onclick="generateOne('${l.id}')" id="gen-${l.id}"
           class="p-2 rounded-lg hover:bg-slate-700 text-slate-400 hover:text-amber-400 transition-colors" title="Regenerate HTML file">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
         </button>
@@ -322,86 +418,33 @@ function render() {
   `).join("");
 }
 
-/* ─── TEMPLATE ─── */
-async function loadTemplate() {
-  const res  = await gh(TEMPLATE_PATH);
-  const file = await res.json();
-  return atob(file.content);
-}
-
-/* ─── WRITE REDIRECT FILE ─── */
-async function writeRedirect(path, redirectTo, fetchedTitle, fetchedDescription) {
-  const filePath = filePathFromPath(path);
-  let html = await loadTemplate();
-  html = html.replaceAll("{{TITLE}}", fetchedTitle || "Redirecting…");
-  html = html.replaceAll("{{DESCRIPTION}}", fetchedDescription || "");
-  html = html.replaceAll("{{REDIRECT_URL}}", redirectTo);
-  const content = btoa(unescape(encodeURIComponent(html)));
-  let sha = null;
-  const check = await gh(filePath);
-  if (check.ok) sha = (await check.json()).sha;
-  await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${filePath}`, {
-    method: "PUT",
-    headers: { Authorization: `token ${token}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ message: `Write redirect: ${path}`, content, ...(sha && { sha }) })
-  });
-}
-
-/* ─── DELETE REDIRECT FILE ─── */
-async function deleteRedirectFile(path) {
-  const filePath = filePathFromPath(path);
-  const check = await gh(filePath);
-  if (!check.ok) return;
-  const { sha } = await check.json();
-  await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${filePath}`, {
-    method: "DELETE",
-    headers: { Authorization: `token ${token}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ message: `Delete redirect: ${path}`, sha })
-  });
-}
-
-/* ─── SAVE JSON ─── */
-async function saveJSON(message = "Update links.json") {
-  const res  = await gh(LINKS_JSON);
-  const file = await res.json();
-  await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${LINKS_JSON}`, {
-    method: "PUT",
-    headers: { Authorization: `token ${token}`, "Content-Type": "application/json" },
-    body: JSON.stringify({
-      message,
-      content: btoa(unescape(encodeURIComponent(JSON.stringify({ links }, null, 2)))),
-      sha: file.sha
-    })
-  });
-  await loadLinks();
-}
-
-/* ─── MODAL: NEW ─── */
+/* ══════════════════════════════════════════
+   MODAL — NEW / EDIT
+══════════════════════════════════════════ */
 function openNew() {
-  document.getElementById("modalTitle").textContent = "New Link";
-  document.getElementById("mId").value       = "";
-  document.getElementById("mOldPath").value  = "";
-  document.getElementById("mRedirectTo").value = "";
-  document.getElementById("mPath").value     = "";
-  document.getElementById("mTitle").value    = "";
-  document.getElementById("mFetchedTitle").value = "";
-  document.getElementById("mFetchedDescription").value = "";
+  document.getElementById("modalTitle").textContent       = "New Link";
+  document.getElementById("mId").value                   = "";
+  document.getElementById("mOldPath").value              = "";
+  document.getElementById("mRedirectTo").value           = "";
+  document.getElementById("mPath").value                 = "";
+  document.getElementById("mTitle").value                = "";
+  document.getElementById("mFetchedTitle").value         = "";
+  document.getElementById("mFetchedDescription").value  = "";
   document.getElementById("metaStatus").classList.add("hidden");
   document.getElementById("modal").classList.remove("hidden");
 }
 
-/* ─── MODAL: EDIT ─── */
 function editLink(id) {
   const l = links.find(x => x.id === id);
   if (!l) return;
-  document.getElementById("modalTitle").textContent = "Edit Link";
-  document.getElementById("mId").value       = l.id;
-  document.getElementById("mOldPath").value  = l.path;
-  document.getElementById("mRedirectTo").value = l.redirectTo;
-  document.getElementById("mPath").value     = l.path;
-  document.getElementById("mTitle").value    = l.title || "";
-  document.getElementById("mFetchedTitle").value = l.fetchedTitle || "";
-  document.getElementById("mFetchedDescription").value = l.fetchedDescription || "";
+  document.getElementById("modalTitle").textContent       = "Edit Link";
+  document.getElementById("mId").value                   = l.id;
+  document.getElementById("mOldPath").value              = l.path;
+  document.getElementById("mRedirectTo").value           = l.redirect_to;
+  document.getElementById("mPath").value                 = l.path;
+  document.getElementById("mTitle").value                = l.title || "";
+  document.getElementById("mFetchedTitle").value         = l.fetched_title || "";
+  document.getElementById("mFetchedDescription").value  = l.fetched_description || "";
   document.getElementById("metaStatus").classList.add("hidden");
   document.getElementById("modal").classList.remove("hidden");
 }
@@ -410,23 +453,18 @@ function closeModal() {
   document.getElementById("modal").classList.add("hidden");
 }
 
-/* ─── MODAL: FETCH META ─── */
 async function fetchMeta() {
   const url = document.getElementById("mRedirectTo").value.trim();
   if (!url.startsWith("https://")) return showMetaStatus("URL must start with https://", "error");
   const btn = document.getElementById("fetchBtn");
-  btn.textContent = "Fetching…";
-  btn.disabled = true;
+  btn.textContent = "Fetching…"; btn.disabled = true;
   showMetaStatus("Fetching metadata…", "info");
   const meta = await fetchMetadata(url);
-  document.getElementById("mFetchedTitle").value = meta.title;
+  document.getElementById("mFetchedTitle").value        = meta.title;
   document.getElementById("mFetchedDescription").value = meta.description;
-  if (!document.getElementById("mTitle").value) {
-    document.getElementById("mTitle").value = meta.title;
-  }
+  if (!document.getElementById("mTitle").value) document.getElementById("mTitle").value = meta.title;
   showMetaStatus(`Fetched: "${meta.title}"`, "ok");
-  btn.textContent = "Fetch Meta";
-  btn.disabled = false;
+  btn.textContent = "Fetch Meta"; btn.disabled = false;
 }
 
 function showMetaStatus(msg, type) {
@@ -436,56 +474,55 @@ function showMetaStatus(msg, type) {
   el.classList.remove("hidden");
 }
 
-/* ─── MODAL: SAVE ─── */
+/* ─── SAVE (insert or update in Supabase) ─── */
 async function saveModal() {
   const id          = document.getElementById("mId").value;
   const oldPath     = document.getElementById("mOldPath").value;
-  const redirectTo  = document.getElementById("mRedirectTo").value.trim();
+  const redirect_to = document.getElementById("mRedirectTo").value.trim();
   const path        = document.getElementById("mPath").value.trim();
   const title       = document.getElementById("mTitle").value.trim();
-  let fetchedTitle  = document.getElementById("mFetchedTitle").value.trim();
-  let fetchedDesc   = document.getElementById("mFetchedDescription").value.trim();
+  let fetched_title = document.getElementById("mFetchedTitle").value.trim();
+  let fetched_desc  = document.getElementById("mFetchedDescription").value.trim();
 
-  if (!path.startsWith("/"))    return toast("Path must start with /", "error");
-  if (!redirectTo.startsWith("https://")) return toast("Redirect URL must start with https://", "error");
+  if (!path.startsWith("/"))           return toast("Path must start with /", "error");
+  if (!redirect_to.startsWith("https://")) return toast("Redirect URL must start with https://", "error");
 
-  // If no fetched meta yet, go get it
-  if (!fetchedTitle) {
+  if (!fetched_title) {
     toast("Fetching page metadata…", "info");
-    const meta = await fetchMetadata(redirectTo);
-    fetchedTitle = meta.title;
-    fetchedDesc  = meta.description;
+    const meta = await fetchMetadata(redirect_to);
+    fetched_title = meta.title;
+    fetched_desc  = meta.description;
   }
 
   const saveBtn = document.getElementById("saveBtn");
-  saveBtn.textContent = "Saving…";
-  saveBtn.disabled = true;
+  saveBtn.textContent = "Saving…"; saveBtn.disabled = true;
 
   try {
     if (id) {
-      // EDIT — if path changed, delete old file
+      // EDIT — if path changed, delete old HTML file first
       if (oldPath && oldPath !== path) await deleteRedirectFile(oldPath);
+      const updated = await sbUpdate(id, { title: title || fetched_title, path, redirect_to, fetched_title, fetched_description: fetched_desc });
       const idx = links.findIndex(l => l.id === id);
-      if (idx !== -1) {
-        links[idx] = { id, title: title || fetchedTitle, path, redirectTo, fetchedTitle, fetchedDescription: fetchedDesc };
-      }
+      if (idx !== -1) links[idx] = updated || { ...links[idx], title: title || fetched_title, path, redirect_to, fetched_title, fetched_description: fetched_desc };
     } else {
-      // NEW
-      links.push({ id: crypto.randomUUID(), title: title || fetchedTitle, path, redirectTo, fetchedTitle, fetchedDescription: fetchedDesc });
+      // NEW — insert row, get back the generated id
+      const newRow = await sbInsert({ title: title || fetched_title, path, redirect_to, fetched_title, fetched_description: fetched_desc });
+      links.push(newRow || { id: crypto.randomUUID(), title: title || fetched_title, path, redirect_to, fetched_title, fetched_description: fetched_desc });
     }
-    await writeRedirect(path, redirectTo, fetchedTitle, fetchedDesc);
-    await saveJSON(id ? `Edit link: ${path}` : `Add link: ${path}`);
+    await writeRedirect(path, redirect_to, fetched_title, fetched_desc);
+    render();
     closeModal();
     toast(`Link saved: ${path}`, "ok");
   } catch(e) {
     toast("Save failed: " + e.message, "error");
   } finally {
-    saveBtn.textContent = "Save";
-    saveBtn.disabled = false;
+    saveBtn.textContent = "Save"; saveBtn.disabled = false;
   }
 }
 
-/* ─── DELETE ─── */
+/* ══════════════════════════════════════════
+   DELETE
+══════════════════════════════════════════ */
 function deleteLink(id) {
   const l = links.find(x => x.id === id);
   if (!l) return;
@@ -505,9 +542,12 @@ async function confirmDelete() {
   closeDeleteModal();
   toast("Deleting…", "info");
   try {
-    await deleteRedirectFile(l.path);
+    await Promise.all([
+      deleteRedirectFile(l.path),   // remove HTML file from GitHub
+      sbDelete(l.id)                // remove row from Supabase
+    ]);
     links = links.filter(x => x.id !== pendingDeleteId);
-    await saveJSON(`Delete link: ${l.path}`);
+    render();
     toast(`Deleted: ${l.path}`, "ok");
   } catch(e) {
     toast("Delete failed: " + e.message, "error");
@@ -515,46 +555,45 @@ async function confirmDelete() {
   pendingDeleteId = null;
 }
 
-/* ─── IMPORT CSV ─── */
-// Expected CSV format: path,redirectTo,title(optional)
+/* ══════════════════════════════════════════
+   IMPORT CSV
+   Format: path,redirect_to,title(optional)
+══════════════════════════════════════════ */
 function importCSV() {
   const file = document.getElementById("csvInput").files[0];
   if (!file) return;
   const reader = new FileReader();
   reader.onload = async (e) => {
-    const rows = e.target.result.trim().split("\n").slice(1); // skip header
+    const rows = e.target.result.trim().split("\n").slice(1);
     let count = 0;
     for (const row of rows) {
       const cols = row.split(",").map(c => c.trim().replace(/^"|"$/g, ""));
-      const [path, redirectTo, title] = cols;
-      if (!path || !redirectTo) continue;
-      if (!path.startsWith("/") || !redirectTo.startsWith("https://")) continue;
-      const existing = links.find(l => l.path === path);
-      if (existing) continue; // skip duplicates
-      const meta = await fetchMetadata(redirectTo);
-      links.push({
-        id: crypto.randomUUID(),
+      const [path, redirect_to, title] = cols;
+      if (!path || !redirect_to) continue;
+      if (!path.startsWith("/") || !redirect_to.startsWith("https://")) continue;
+      if (links.find(l => l.path === path)) continue; // skip duplicates
+      const meta = await fetchMetadata(redirect_to);
+      const newRow = await sbInsert({
         title: title || meta.title,
         path,
-        redirectTo,
-        fetchedTitle: meta.title,
-        fetchedDescription: meta.description
+        redirect_to,
+        fetched_title:       meta.title,
+        fetched_description: meta.description
       });
-      await writeRedirect(path, redirectTo, meta.title, meta.description);
+      links.push(newRow || { id: crypto.randomUUID(), title: title || meta.title, path, redirect_to, fetched_title: meta.title, fetched_description: meta.description });
+      await writeRedirect(path, redirect_to, meta.title, meta.description);
       count++;
     }
-    if (count > 0) {
-      await saveJSON(`Import ${count} links via CSV`);
-      toast(`Imported ${count} link${count !== 1 ? "s" : ""}`, "ok");
-    } else {
-      toast("No new links found in CSV.", "info");
-    }
+    render();
     document.getElementById("csvInput").value = "";
+    toast(count > 0 ? `Imported ${count} link${count !== 1 ? "s" : ""}` : "No new links found in CSV.", count > 0 ? "ok" : "info");
   };
   reader.readAsText(file);
 }
 
-/* ─── GENERATE SINGLE ─── */
+/* ══════════════════════════════════════════
+   GENERATE SINGLE
+══════════════════════════════════════════ */
 async function generateOne(id) {
   const l = links.find(x => x.id === id);
   if (!l) return;
@@ -565,14 +604,14 @@ async function generateOne(id) {
   }
   try {
     toast(`Fetching metadata for ${l.path}…`, "info");
-    const meta = await fetchMetadata(l.redirectTo);
-    await writeRedirect(l.path, l.redirectTo, meta.title, meta.description);
-    // persist fetched meta back into the JSON
+    const meta = await fetchMetadata(l.redirect_to);
+    // update Supabase row with fresh meta
+    await sbUpdate(l.id, { fetched_title: meta.title, fetched_description: meta.description });
+    // update HTML file
+    await writeRedirect(l.path, l.redirect_to, meta.title, meta.description);
+    // update in-memory
     const idx = links.findIndex(x => x.id === id);
-    if (idx !== -1) {
-      links[idx] = { ...links[idx], fetchedTitle: meta.title, fetchedDescription: meta.description };
-    }
-    await saveJSON(`Regenerate: ${l.path}`);
+    if (idx !== -1) links[idx] = { ...links[idx], fetched_title: meta.title, fetched_description: meta.description };
     toast(`Generated ${l.path}`, "ok");
   } catch(e) {
     toast(`Failed: ${e.message}`, "error");
@@ -584,25 +623,23 @@ async function generateOne(id) {
   }
 }
 
-/* ─── GENERATE ALL ─── */
+/* ══════════════════════════════════════════
+   GENERATE ALL
+══════════════════════════════════════════ */
 async function generateAll() {
   if (!links.length) return toast("No links to generate.", "info");
 
-  // open modal
-  const modal    = document.getElementById("genModal");
-  const titleEl  = document.getElementById("genModalTitle");
-  const barEl    = document.getElementById("genBar");
-  const curEl    = document.getElementById("genCurrent");
-  const logEl    = document.getElementById("genLog");
-  const doneBtn  = document.getElementById("genDoneBtn");
-  const spinner  = document.getElementById("genSpinner");
+  const modal   = document.getElementById("genModal");
+  const titleEl = document.getElementById("genModalTitle");
+  const barEl   = document.getElementById("genBar");
+  const curEl   = document.getElementById("genCurrent");
+  const logEl   = document.getElementById("genLog");
+  const doneBtn = document.getElementById("genDoneBtn");
+  const spinner = document.getElementById("genSpinner");
 
   titleEl.textContent = `Generating ${links.length} link${links.length !== 1 ? "s" : ""}…`;
-  barEl.style.width   = "0%";
-  curEl.textContent   = "Starting…";
-  logEl.innerHTML     = "";
-  doneBtn.classList.add("hidden");
-  spinner.classList.remove("hidden");
+  barEl.style.width = "0%"; curEl.textContent = "Starting…";
+  logEl.innerHTML = ""; doneBtn.classList.add("hidden"); spinner.classList.remove("hidden");
   modal.classList.remove("hidden");
 
   let done = 0, succeeded = 0, failed = 0;
@@ -620,13 +657,14 @@ async function generateAll() {
   for (const l of links) {
     curEl.textContent = l.path;
     try {
-      const meta = await fetchMetadata(l.redirectTo);
-      await writeRedirect(l.path, l.redirectTo, meta.title, meta.description);
-      // update in-memory meta
+      const meta = await fetchMetadata(l.redirect_to);
+      // update Supabase row
+      await sbUpdate(l.id, { fetched_title: meta.title, fetched_description: meta.description });
+      // write HTML file to GitHub
+      await writeRedirect(l.path, l.redirect_to, meta.title, meta.description);
+      // update in-memory
       const idx = links.findIndex(x => x.id === l.id);
-      if (idx !== -1) {
-        links[idx] = { ...links[idx], fetchedTitle: meta.title, fetchedDescription: meta.description };
-      }
+      if (idx !== -1) links[idx] = { ...links[idx], fetched_title: meta.title, fetched_description: meta.description };
       addLog(l.path, "ok", meta.title || "—");
       succeeded++;
     } catch(e) {
@@ -637,24 +675,17 @@ async function generateAll() {
     barEl.style.width = `${Math.round((done / links.length) * 100)}%`;
   }
 
-  // persist all updated meta to JSON in one shot
-  try {
-    await saveJSON(`Regenerate all ${links.length} links`);
-  } catch(e) {
-    addLog("links.json", "error", "Failed to save JSON: " + e.message);
-  }
-
   titleEl.textContent = `Done — ${succeeded} generated${failed ? `, ${failed} failed` : ""}`;
-  curEl.textContent   = "";
-  spinner.classList.add("hidden");
-  doneBtn.classList.remove("hidden");
+  curEl.textContent = ""; spinner.classList.add("hidden"); doneBtn.classList.remove("hidden");
 }
 
 function closeGenModal() {
   document.getElementById("genModal").classList.add("hidden");
 }
 
-/* ─── ANALYTICS ─── */
+/* ══════════════════════════════════════════
+   ANALYTICS  (unchanged — uses existing view)
+══════════════════════════════════════════ */
 function formatTimestamp(value) {
   if (!value) return "—";
   const d = new Date(value);
@@ -664,16 +695,11 @@ function formatTimestamp(value) {
 async function loadAnalyticsSummary() {
   const statusEl = document.getElementById("analyticsStatus");
   const tableEl  = document.getElementById("analyticsTable");
-  statusEl.textContent = "Loading…";
-  statusEl.classList.remove("hidden");
+  statusEl.textContent = "Loading…"; statusEl.classList.remove("hidden");
   tableEl.innerHTML = "";
-
-  // Query the pre-built summary VIEW (fixes the invalid ?group= param bug)
   const url = `${SUPABASE_URL}/rest/v1/${ANALYTICS_VIEW}?select=path,total_events,last_seen&order=last_seen.desc`;
   try {
-    const res = await fetch(url, {
-      headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` }
-    });
+    const res = await fetch(url, { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` } });
     if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
     const data = await res.json();
     if (!data.length) {
@@ -696,28 +722,27 @@ async function loadAnalyticsSummary() {
   }
 }
 
-/* ─── TOAST ─── */
-function toast(msg, type = "info") {
-  const el = document.getElementById("toast");
-  const colors = { ok: "border-green-500 text-green-400", error: "border-red-500 text-red-400", info: "border-slate-600 text-slate-300" };
-  el.className = `fixed bottom-5 right-5 z-50 bg-slate-800 border text-sm rounded-xl px-4 py-3 shadow-xl mono fade-in ${colors[type]}`;
-  el.textContent = msg;
-  el.classList.remove("hidden");
-  clearTimeout(el._timer);
-  el._timer = setTimeout(() => el.classList.add("hidden"), 3500);
-}
-
-/* ─── UTILS ─── */
+/* ══════════════════════════════════════════
+   UTILS + EVENTS
+══════════════════════════════════════════ */
 function escHtml(str) {
   return String(str ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 }
 
-/* ─── EVENTS ─── */
+function toast(msg, type = "info") {
+  const el = document.getElementById("toast");
+  const colors = { ok: "border-green-500 text-green-400", error: "border-red-500 text-red-400", info: "border-slate-600 text-slate-300" };
+  el.className = `fixed bottom-5 right-5 z-50 bg-slate-800 border text-sm rounded-xl px-4 py-3 shadow-xl mono fade-in ${colors[type]}`;
+  el.textContent = msg; el.classList.remove("hidden");
+  clearTimeout(el._timer);
+  el._timer = setTimeout(() => el.classList.add("hidden"), 3500);
+}
+
 document.getElementById("searchInput").addEventListener("input", render);
 document.getElementById("tokenInput").addEventListener("keydown", e => e.key === "Enter" && login());
-document.getElementById("modal").addEventListener("click", e => { if (e.target === document.getElementById("modal")) closeModal(); });
+document.getElementById("modal").addEventListener("click",       e => { if (e.target === document.getElementById("modal"))       closeModal(); });
 document.getElementById("deleteModal").addEventListener("click", e => { if (e.target === document.getElementById("deleteModal")) closeDeleteModal(); });
-document.getElementById("genModal").addEventListener("click", e => { if (e.target === document.getElementById("genModal") && !document.getElementById("genDoneBtn").classList.contains("hidden")) closeGenModal(); });
+document.getElementById("genModal").addEventListener("click",    e => { if (e.target === document.getElementById("genModal") && !document.getElementById("genDoneBtn").classList.contains("hidden")) closeGenModal(); });
 </script>
 </body>
 </html>
