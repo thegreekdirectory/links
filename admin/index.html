@@ -202,7 +202,7 @@
 /* ─── CONFIG ─── */
 const OWNER         = "thegreekdirectory";
 const REPO          = "links";
-const TEMPLATE_PATH = "admin/_template.html";
+const TEMPLATE_PATH = "_template.html";       // still on GitHub for generating HTML files
 
 const SUPABASE_URL      = "https://luetekzqrrgdxtopzvqw.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1ZXRla3pxcnJnZHh0b3B6dnF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgzNDc2NDcsImV4cCI6MjA4MzkyMzY0N30.TIrNG8VGumEJc_9JvNHW-Q-UWfUGpPxR0v8POjWZJYg";
@@ -218,16 +218,20 @@ let pendingDeleteId = null;
 ══════════════════════════════════════════ */
 async function login() {
   const t = document.getElementById("tokenInput").value.trim();
+  console.log("[auth] login attempt");
   if (!t) return showLoginError("Token is required.");
   token = t;
+  console.log("[auth] verifying GitHub token…");
   const res = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}`, {
     headers: { Authorization: `token ${token}` }
   });
+  console.log("[auth] GitHub verify response:", res.status, res.statusText);
   if (!res.ok) { token = ""; return showLoginError("Invalid token or no access to repo."); }
   document.getElementById("loginScreen").classList.add("hidden");
   document.getElementById("app").classList.remove("hidden");
   document.getElementById("statusBadge").textContent = "connected";
   document.getElementById("statusBadge").classList.replace("text-slate-500", "text-green-400");
+  console.log("[auth] login successful");
   loadLinks();
   loadAnalyticsSummary();
 }
@@ -254,39 +258,47 @@ function sbHeaders(extra = {}) {
 }
 
 async function sbSelect(params = "") {
-  const res = await fetch(
-    `${SUPABASE_URL}/rest/v1/${SHORTLINKS_TABLE}${params}`,
-    { headers: sbHeaders() }
-  );
+  const url = `${SUPABASE_URL}/rest/v1/${SHORTLINKS_TABLE}${params}`;
+  console.log("[sb] SELECT", url);
+  const res = await fetch(url, { headers: sbHeaders() });
+  console.log("[sb] SELECT response:", res.status, res.statusText);
   if (!res.ok) throw new Error(await res.text());
   return res.json();
 }
 
 async function sbInsert(row) {
+  console.log("[sb] INSERT", row);
   const res = await fetch(
     `${SUPABASE_URL}/rest/v1/${SHORTLINKS_TABLE}`,
     { method: "POST", headers: sbHeaders(), body: JSON.stringify(row) }
   );
+  console.log("[sb] INSERT response:", res.status, res.statusText);
   if (!res.ok) throw new Error(await res.text());
   const data = await res.json();
+  console.log("[sb] INSERT result:", data);
   return Array.isArray(data) ? data[0] : data;
 }
 
 async function sbUpdate(id, patch) {
+  console.log("[sb] UPDATE", id, patch);
   const res = await fetch(
     `${SUPABASE_URL}/rest/v1/${SHORTLINKS_TABLE}?id=eq.${encodeURIComponent(id)}`,
     { method: "PATCH", headers: sbHeaders(), body: JSON.stringify(patch) }
   );
+  console.log("[sb] UPDATE response:", res.status, res.statusText);
   if (!res.ok) throw new Error(await res.text());
   const data = await res.json();
+  console.log("[sb] UPDATE result:", data);
   return Array.isArray(data) ? data[0] : data;
 }
 
 async function sbDelete(id) {
+  console.log("[sb] DELETE", id);
   const res = await fetch(
     `${SUPABASE_URL}/rest/v1/${SHORTLINKS_TABLE}?id=eq.${encodeURIComponent(id)}`,
     { method: "DELETE", headers: sbHeaders({ Prefer: "return=minimal" }) }
   );
+  console.log("[sb] DELETE response:", res.status, res.statusText);
   if (!res.ok) throw new Error(await res.text());
 }
 
@@ -304,13 +316,16 @@ function filePathFromPath(path) {
 }
 
 async function loadTemplate() {
+  console.log("[gh] loading template from:", TEMPLATE_PATH);
   const res  = await gh(TEMPLATE_PATH);
   const file = await res.json();
+  console.log("[gh] template loaded, size:", file.content?.length, "chars (base64)");
   return atob(file.content);
 }
 
 async function writeRedirect(path, redirectTo, fetchedTitle, fetchedDescription) {
   const filePath = filePathFromPath(path);
+  console.log("[gh] writeRedirect →", filePath, { redirectTo, fetchedTitle });
   let html = await loadTemplate();
   html = html.replaceAll("{{TITLE}}",        fetchedTitle        || "Redirecting…");
   html = html.replaceAll("{{DESCRIPTION}}", fetchedDescription  || "");
@@ -318,42 +333,56 @@ async function writeRedirect(path, redirectTo, fetchedTitle, fetchedDescription)
   const content = btoa(unescape(encodeURIComponent(html)));
   let sha = null;
   const check = await gh(filePath);
+  console.log("[gh] existing file check:", check.status);
   if (check.ok) sha = (await check.json()).sha;
-  await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${filePath}`, {
+  const putRes = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${filePath}`, {
     method: "PUT",
     headers: { Authorization: `token ${token}`, "Content-Type": "application/json" },
     body: JSON.stringify({ message: `Write redirect: ${path}`, content, ...(sha && { sha }) })
   });
+  console.log("[gh] PUT", filePath, "→", putRes.status, putRes.statusText);
+  if (!putRes.ok) throw new Error(`GitHub write failed (${putRes.status}): ${await putRes.text()}`);
 }
 
 async function deleteRedirectFile(path) {
   const filePath = filePathFromPath(path);
+  console.log("[gh] deleteRedirectFile →", filePath);
   const check = await gh(filePath);
-  if (!check.ok) return;
+  console.log("[gh] file exists check:", check.status);
+  if (!check.ok) { console.log("[gh] file not found, skipping delete"); return; }
   const { sha } = await check.json();
-  await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${filePath}`, {
+  const delRes = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${filePath}`, {
     method: "DELETE",
     headers: { Authorization: `token ${token}`, "Content-Type": "application/json" },
     body: JSON.stringify({ message: `Delete redirect: ${path}`, sha })
   });
+  console.log("[gh] DELETE", filePath, "→", delRes.status, delRes.statusText);
 }
 
 /* ══════════════════════════════════════════
    METADATA SCRAPER
 ══════════════════════════════════════════ */
 async function fetchMetadata(url) {
+  console.log("[meta] fetching metadata for:", url);
   try {
-    const res  = await fetch("https://api.allorigins.win/raw?url=" + encodeURIComponent(url));
+    const proxyUrl = "https://api.allorigins.win/raw?url=" + encodeURIComponent(url);
+    console.log("[meta] proxy URL:", proxyUrl);
+    const res  = await fetch(proxyUrl);
+    console.log("[meta] proxy response:", res.status, res.statusText);
     const html = await res.text();
+    console.log("[meta] HTML snippet (first 300 chars):", html.slice(0, 300));
     const titleMatch = html.match(/<meta property="og:title" content="([^"]+)"/i)
                     || html.match(/<title[^>]*>(.*?)<\/title>/is);
     const descMatch  = html.match(/<meta property="og:description" content="([^"]+)"/i)
                     || html.match(/<meta name="description" content="([^"]+)"/i);
-    return {
+    const result = {
       title:       titleMatch ? titleMatch[1].trim() : "Redirecting…",
       description: descMatch  ? descMatch[1].trim()  : ""
     };
-  } catch {
+    console.log("[meta] result:", result);
+    return result;
+  } catch (err) {
+    console.warn("[meta] fetch failed:", err);
     return { title: "Redirecting…", description: "" };
   }
 }
@@ -362,12 +391,15 @@ async function fetchMetadata(url) {
    LOAD LINKS  (from Supabase)
 ══════════════════════════════════════════ */
 async function loadLinks() {
+  console.log("[links] loadLinks called");
   document.getElementById("list").innerHTML =
     `<div class="flex items-center justify-center py-10 text-slate-600 text-sm">Loading…</div>`;
   try {
     links = await sbSelect("?select=*&order=created_at.asc");
+    console.log("[links] loaded", links.length, "links:", links);
     render();
   } catch(e) {
+    console.error("[links] loadLinks failed:", e);
     document.getElementById("list").innerHTML =
       `<div class="flex items-center justify-center py-10 text-red-500 text-sm">Failed to load: ${escHtml(e.message)}</div>`;
   }
@@ -422,6 +454,7 @@ function render() {
    MODAL — NEW / EDIT
 ══════════════════════════════════════════ */
 function openNew() {
+  console.log("[modal] openNew");
   document.getElementById("modalTitle").textContent       = "New Link";
   document.getElementById("mId").value                   = "";
   document.getElementById("mOldPath").value              = "";
@@ -436,6 +469,7 @@ function openNew() {
 
 function editLink(id) {
   const l = links.find(x => x.id === id);
+  console.log("[modal] editLink", id, l);
   if (!l) return;
   document.getElementById("modalTitle").textContent       = "Edit Link";
   document.getElementById("mId").value                   = l.id;
@@ -450,16 +484,19 @@ function editLink(id) {
 }
 
 function closeModal() {
+  console.log("[modal] closeModal");
   document.getElementById("modal").classList.add("hidden");
 }
 
 async function fetchMeta() {
   const url = document.getElementById("mRedirectTo").value.trim();
+  console.log("[modal] fetchMeta for:", url);
   if (!url.startsWith("https://")) return showMetaStatus("URL must start with https://", "error");
   const btn = document.getElementById("fetchBtn");
   btn.textContent = "Fetching…"; btn.disabled = true;
   showMetaStatus("Fetching metadata…", "info");
   const meta = await fetchMetadata(url);
+  console.log("[modal] fetchMeta result:", meta);
   document.getElementById("mFetchedTitle").value        = meta.title;
   document.getElementById("mFetchedDescription").value = meta.description;
   if (!document.getElementById("mTitle").value) document.getElementById("mTitle").value = meta.title;
@@ -484,14 +521,18 @@ async function saveModal() {
   let fetched_title = document.getElementById("mFetchedTitle").value.trim();
   let fetched_desc  = document.getElementById("mFetchedDescription").value.trim();
 
+  console.log("[save] saveModal called", { id, oldPath, redirect_to, path, title, fetched_title });
+
   if (!path.startsWith("/"))           return toast("Path must start with /", "error");
   if (!redirect_to.startsWith("https://")) return toast("Redirect URL must start with https://", "error");
 
   if (!fetched_title) {
+    console.log("[save] no fetched_title, fetching metadata now…");
     toast("Fetching page metadata…", "info");
     const meta = await fetchMetadata(redirect_to);
     fetched_title = meta.title;
     fetched_desc  = meta.description;
+    console.log("[save] auto-fetched metadata:", meta);
   }
 
   const saveBtn = document.getElementById("saveBtn");
@@ -499,21 +540,29 @@ async function saveModal() {
 
   try {
     if (id) {
-      // EDIT — if path changed, delete old HTML file first
-      if (oldPath && oldPath !== path) await deleteRedirectFile(oldPath);
+      console.log("[save] updating existing link:", id);
+      if (oldPath && oldPath !== path) {
+        console.log("[save] path changed, deleting old file:", oldPath);
+        await deleteRedirectFile(oldPath);
+      }
       const updated = await sbUpdate(id, { title: title || fetched_title, path, redirect_to, fetched_title, fetched_description: fetched_desc });
+      console.log("[save] sbUpdate result:", updated);
       const idx = links.findIndex(l => l.id === id);
       if (idx !== -1) links[idx] = updated || { ...links[idx], title: title || fetched_title, path, redirect_to, fetched_title, fetched_description: fetched_desc };
     } else {
-      // NEW — insert row, get back the generated id
+      console.log("[save] inserting new link");
       const newRow = await sbInsert({ title: title || fetched_title, path, redirect_to, fetched_title, fetched_description: fetched_desc });
+      console.log("[save] sbInsert result:", newRow);
       links.push(newRow || { id: crypto.randomUUID(), title: title || fetched_title, path, redirect_to, fetched_title, fetched_description: fetched_desc });
     }
+    console.log("[save] writing redirect HTML…");
     await writeRedirect(path, redirect_to, fetched_title, fetched_desc);
     render();
     closeModal();
     toast(`Link saved: ${path}`, "ok");
+    console.log("[save] ✓ complete");
   } catch(e) {
+    console.error("[save] error:", e);
     toast("Save failed: " + e.message, "error");
   } finally {
     saveBtn.textContent = "Save"; saveBtn.disabled = false;
@@ -525,6 +574,7 @@ async function saveModal() {
 ══════════════════════════════════════════ */
 function deleteLink(id) {
   const l = links.find(x => x.id === id);
+  console.log("[delete] deleteLink called", id, l);
   if (!l) return;
   pendingDeleteId = id;
   document.getElementById("deletePathLabel").textContent = l.path;
@@ -532,24 +582,29 @@ function deleteLink(id) {
 }
 
 function closeDeleteModal() {
+  console.log("[delete] closeDeleteModal");
   pendingDeleteId = null;
   document.getElementById("deleteModal").classList.add("hidden");
 }
 
 async function confirmDelete() {
   const l = links.find(x => x.id === pendingDeleteId);
+  console.log("[delete] confirmDelete", pendingDeleteId, l);
   if (!l) return closeDeleteModal();
   closeDeleteModal();
   toast("Deleting…", "info");
   try {
+    console.log("[delete] deleting HTML file and Supabase row in parallel…");
     await Promise.all([
-      deleteRedirectFile(l.path),   // remove HTML file from GitHub
-      sbDelete(l.id)                // remove row from Supabase
+      deleteRedirectFile(l.path),
+      sbDelete(l.id)
     ]);
     links = links.filter(x => x.id !== pendingDeleteId);
     render();
     toast(`Deleted: ${l.path}`, "ok");
+    console.log("[delete] ✓ complete");
   } catch(e) {
+    console.error("[delete] error:", e);
     toast("Delete failed: " + e.message, "error");
   }
   pendingDeleteId = null;
@@ -558,36 +613,132 @@ async function confirmDelete() {
 /* ══════════════════════════════════════════
    IMPORT CSV
    Format: path,redirect_to,title(optional)
+   Handles CRLF, LF, quoted fields w/ commas.
 ══════════════════════════════════════════ */
+
+// RFC-4180-compatible CSV row parser
+function parseCSVLine(line) {
+  const result = [];
+  let cur = "", inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (ch === '"') {
+      if (inQuotes && line[i + 1] === '"') { cur += '"'; i++; }  // escaped quote
+      else inQuotes = !inQuotes;
+    } else if (ch === ',' && !inQuotes) {
+      result.push(cur.trim());
+      cur = "";
+    } else {
+      cur += ch;
+    }
+  }
+  result.push(cur.trim());
+  return result;
+}
+
 function importCSV() {
-  const file = document.getElementById("csvInput").files[0];
-  if (!file) return;
+  const fileEl = document.getElementById("csvInput");
+  const file = fileEl.files[0];
+  console.log("[CSV] importCSV triggered", file ? file.name : "no file");
+  if (!file) { toast("No file selected.", "error"); return; }
+
   const reader = new FileReader();
   reader.onload = async (e) => {
-    const rows = e.target.result.trim().split("\n").slice(1);
-    let count = 0;
-    for (const row of rows) {
-      const cols = row.split(",").map(c => c.trim().replace(/^"|"$/g, ""));
-      const [path, redirect_to, title] = cols;
-      if (!path || !redirect_to) continue;
-      if (!path.startsWith("/") || !redirect_to.startsWith("https://")) continue;
-      if (links.find(l => l.path === path)) continue; // skip duplicates
-      const meta = await fetchMetadata(redirect_to);
-      const newRow = await sbInsert({
-        title: title || meta.title,
-        path,
-        redirect_to,
-        fetched_title:       meta.title,
-        fetched_description: meta.description
-      });
-      links.push(newRow || { id: crypto.randomUUID(), title: title || meta.title, path, redirect_to, fetched_title: meta.title, fetched_description: meta.description });
-      await writeRedirect(path, redirect_to, meta.title, meta.description);
-      count++;
+    // Normalise line endings (CRLF → LF, old CR → LF)
+    const raw = e.target.result.replace(/\r\n/g, "\n").replace(/\r/g, "\n").trim();
+    console.log("[CSV] raw content (first 200 chars):", raw.slice(0, 200));
+
+    const allLines = raw.split("\n");
+    console.log(`[CSV] total lines including header: ${allLines.length}`);
+
+    const header = parseCSVLine(allLines[0]);
+    console.log("[CSV] detected header:", header);
+
+    const dataRows = allLines.slice(1).filter(l => l.trim() !== "");
+    console.log(`[CSV] data rows to process: ${dataRows.length}`);
+
+    let count = 0, skipped = 0, errors = 0;
+
+    for (let i = 0; i < dataRows.length; i++) {
+      const line = dataRows[i];
+      console.log(`[CSV] processing row ${i + 1}:`, line);
+
+      const cols = parseCSVLine(line);
+      const path       = cols[0] || "";
+      const redirect_to = cols[1] || "";
+      const title      = cols[2] || "";
+
+      console.log(`[CSV] row ${i + 1} parsed →`, { path, redirect_to, title });
+
+      if (!path || !redirect_to) {
+        console.warn(`[CSV] row ${i + 1} SKIPPED — missing path or redirect_to`);
+        skipped++; continue;
+      }
+      if (!path.startsWith("/")) {
+        console.warn(`[CSV] row ${i + 1} SKIPPED — path doesn't start with /: "${path}"`);
+        skipped++; continue;
+      }
+      if (!redirect_to.startsWith("https://")) {
+        console.warn(`[CSV] row ${i + 1} SKIPPED — URL doesn't start with https://: "${redirect_to}"`);
+        skipped++; continue;
+      }
+      if (links.find(l => l.path === path)) {
+        console.warn(`[CSV] row ${i + 1} SKIPPED — duplicate path: "${path}"`);
+        skipped++; continue;
+      }
+
+      try {
+        console.log(`[CSV] row ${i + 1} — fetching metadata for: ${redirect_to}`);
+        const meta = await fetchMetadata(redirect_to);
+        console.log(`[CSV] row ${i + 1} — metadata:`, meta);
+
+        console.log(`[CSV] row ${i + 1} — inserting into Supabase…`);
+        const newRow = await sbInsert({
+          title:               title || meta.title,
+          path,
+          redirect_to,
+          fetched_title:       meta.title,
+          fetched_description: meta.description
+        });
+        console.log(`[CSV] row ${i + 1} — Supabase insert result:`, newRow);
+
+        links.push(newRow || {
+          id: crypto.randomUUID(),
+          title: title || meta.title,
+          path,
+          redirect_to,
+          fetched_title: meta.title,
+          fetched_description: meta.description
+        });
+
+        console.log(`[CSV] row ${i + 1} — writing redirect HTML for: ${path}`);
+        await writeRedirect(path, redirect_to, meta.title, meta.description);
+        console.log(`[CSV] row ${i + 1} — ✓ done`);
+        count++;
+      } catch (err) {
+        console.error(`[CSV] row ${i + 1} — ERROR:`, err);
+        errors++;
+      }
     }
+
     render();
-    document.getElementById("csvInput").value = "";
-    toast(count > 0 ? `Imported ${count} link${count !== 1 ? "s" : ""}` : "No new links found in CSV.", count > 0 ? "ok" : "info");
+    fileEl.value = "";
+    console.log(`[CSV] import complete — imported: ${count}, skipped: ${skipped}, errors: ${errors}`);
+
+    if (count > 0) {
+      toast(`Imported ${count} link${count !== 1 ? "s" : ""}${errors ? `, ${errors} failed` : ""}`, "ok");
+    } else if (errors > 0) {
+      toast(`Import failed — ${errors} error${errors !== 1 ? "s" : ""}. Check console.`, "error");
+    } else {
+      toast(`No new links found (${skipped} skipped).`, "info");
+    }
   };
+
+  reader.onerror = (err) => {
+    console.error("[CSV] FileReader error:", err);
+    toast("Failed to read file.", "error");
+  };
+
   reader.readAsText(file);
 }
 
@@ -596,6 +747,7 @@ function importCSV() {
 ══════════════════════════════════════════ */
 async function generateOne(id) {
   const l = links.find(x => x.id === id);
+  console.log("[gen] generateOne", id, l);
   if (!l) return;
   const btn = document.getElementById(`gen-${id}`);
   if (btn) {
@@ -605,15 +757,15 @@ async function generateOne(id) {
   try {
     toast(`Fetching metadata for ${l.path}…`, "info");
     const meta = await fetchMetadata(l.redirect_to);
-    // update Supabase row with fresh meta
+    console.log("[gen] metadata:", meta);
     await sbUpdate(l.id, { fetched_title: meta.title, fetched_description: meta.description });
-    // update HTML file
     await writeRedirect(l.path, l.redirect_to, meta.title, meta.description);
-    // update in-memory
     const idx = links.findIndex(x => x.id === id);
     if (idx !== -1) links[idx] = { ...links[idx], fetched_title: meta.title, fetched_description: meta.description };
     toast(`Generated ${l.path}`, "ok");
+    console.log("[gen] ✓ done");
   } catch(e) {
+    console.error("[gen] error:", e);
     toast(`Failed: ${e.message}`, "error");
   } finally {
     if (btn) {
@@ -627,6 +779,7 @@ async function generateOne(id) {
    GENERATE ALL
 ══════════════════════════════════════════ */
 async function generateAll() {
+  console.log("[genAll] generateAll called, links:", links.length);
   if (!links.length) return toast("No links to generate.", "info");
 
   const modal   = document.getElementById("genModal");
@@ -656,18 +809,19 @@ async function generateAll() {
 
   for (const l of links) {
     curEl.textContent = l.path;
+    console.log(`[genAll] processing ${l.path}`);
     try {
       const meta = await fetchMetadata(l.redirect_to);
-      // update Supabase row
+      console.log(`[genAll] ${l.path} metadata:`, meta);
       await sbUpdate(l.id, { fetched_title: meta.title, fetched_description: meta.description });
-      // write HTML file to GitHub
       await writeRedirect(l.path, l.redirect_to, meta.title, meta.description);
-      // update in-memory
       const idx = links.findIndex(x => x.id === l.id);
       if (idx !== -1) links[idx] = { ...links[idx], fetched_title: meta.title, fetched_description: meta.description };
       addLog(l.path, "ok", meta.title || "—");
+      console.log(`[genAll] ✓ ${l.path}`);
       succeeded++;
     } catch(e) {
+      console.error(`[genAll] ✗ ${l.path}:`, e);
       addLog(l.path, "error", e.message);
       failed++;
     }
@@ -675,11 +829,13 @@ async function generateAll() {
     barEl.style.width = `${Math.round((done / links.length) * 100)}%`;
   }
 
+  console.log(`[genAll] complete — succeeded: ${succeeded}, failed: ${failed}`);
   titleEl.textContent = `Done — ${succeeded} generated${failed ? `, ${failed} failed` : ""}`;
   curEl.textContent = ""; spinner.classList.add("hidden"); doneBtn.classList.remove("hidden");
 }
 
 function closeGenModal() {
+  console.log("[genAll] closeGenModal");
   document.getElementById("genModal").classList.add("hidden");
 }
 
@@ -693,15 +849,19 @@ function formatTimestamp(value) {
 }
 
 async function loadAnalyticsSummary() {
+  console.log("[analytics] loadAnalyticsSummary called");
   const statusEl = document.getElementById("analyticsStatus");
   const tableEl  = document.getElementById("analyticsTable");
   statusEl.textContent = "Loading…"; statusEl.classList.remove("hidden");
   tableEl.innerHTML = "";
   const url = `${SUPABASE_URL}/rest/v1/${ANALYTICS_VIEW}?select=path,total_events,last_seen&order=last_seen.desc`;
+  console.log("[analytics] fetching:", url);
   try {
     const res = await fetch(url, { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` } });
+    console.log("[analytics] response:", res.status, res.statusText);
     if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
     const data = await res.json();
+    console.log("[analytics] data:", data);
     if (!data.length) {
       statusEl.textContent = "No analytics events yet.";
       tableEl.innerHTML = `<tr><td colspan="3" class="px-5 py-8 text-center text-slate-600 text-sm">No events recorded yet.</td></tr>`;
@@ -717,6 +877,7 @@ async function loadAnalyticsSummary() {
       </tr>
     `).join("");
   } catch(e) {
+    console.error("[analytics] error:", e);
     statusEl.textContent = `Failed to load analytics: ${e.message}`;
     tableEl.innerHTML = `<tr><td colspan="3" class="px-5 py-8 text-center text-red-500 text-sm">Error loading analytics.</td></tr>`;
   }
@@ -738,11 +899,13 @@ function toast(msg, type = "info") {
   el._timer = setTimeout(() => el.classList.add("hidden"), 3500);
 }
 
-document.getElementById("searchInput").addEventListener("input", render);
-document.getElementById("tokenInput").addEventListener("keydown", e => e.key === "Enter" && login());
-document.getElementById("modal").addEventListener("click",       e => { if (e.target === document.getElementById("modal"))       closeModal(); });
-document.getElementById("deleteModal").addEventListener("click", e => { if (e.target === document.getElementById("deleteModal")) closeDeleteModal(); });
-document.getElementById("genModal").addEventListener("click",    e => { if (e.target === document.getElementById("genModal") && !document.getElementById("genDoneBtn").classList.contains("hidden")) closeGenModal(); });
+document.getElementById("searchInput").addEventListener("input", () => { console.log("[search] input changed"); render(); });
+document.getElementById("tokenInput").addEventListener("keydown", e => { if (e.key === "Enter") { console.log("[auth] Enter key → login"); login(); } });
+document.getElementById("modal").addEventListener("click",       e => { if (e.target === document.getElementById("modal"))       { console.log("[modal] backdrop click → close"); closeModal(); } });
+document.getElementById("deleteModal").addEventListener("click", e => { if (e.target === document.getElementById("deleteModal")) { console.log("[delete] backdrop click → close"); closeDeleteModal(); } });
+document.getElementById("genModal").addEventListener("click",    e => { if (e.target === document.getElementById("genModal") && !document.getElementById("genDoneBtn").classList.contains("hidden")) { console.log("[genAll] backdrop click → close"); closeGenModal(); } });
+
+console.log("[init] admin page loaded");
 </script>
 </body>
 </html>
