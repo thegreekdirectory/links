@@ -1,44 +1,126 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="robots" content="noindex">
-<title>Redirecting to Reserved Shortlink - The Greek Directory</title>
-<meta http-equiv="refresh" content="0.5; url=https://tgd.gr/reserved">
-<meta name="description" content="">
-<meta property="og:title" content="Reserved Shortlink - The Greek Directory">
-<meta property="og:description" content="">
-<meta property="og:type" content="website">
-<meta name="shortlink-redirect" content="https://tgd.gr/reserved">
-<script src="admin/analytics.js" data-redirect="https://tgd.gr/reserved" defer></script>
-<script src="https://cdn.tailwindcss.com"></script>
-<link rel="icon" href="https://static.thegreekdirectory.org/img/logo/bluefavicon.png">
-</head>
-<body class="bg-slate-950 min-h-screen flex items-center justify-center px-4">
-  <div class="text-center space-y-4 max-w-sm w-full">
-    <img src="https://social.thegreekdirectory.org/Logo2.png" alt="The Greek Directory" class="w-14 h-auto mx-auto opacity-90">
-    <p class="text-slate-400 text-sm font-mono">Redirecting you to</p>
-    <a href="https://tgd.gr/reserved"
-       class="text-white text-base font-medium underline underline-offset-2 decoration-slate-600 hover:decoration-white transition-all break-all">
-      https://tgd.gr/reserved
-    </a>
-    <div class="pt-2">
-      <div class="w-32 h-0.5 bg-slate-800 rounded-full mx-auto overflow-hidden">
-        <div class="h-full bg-blue-500 rounded-full animate-[progress_0.6s_linear_forwards]"></div>
-      </div>
-    </div>
-  </div>
+  <meta charset="UTF-8">
+  <title>Invalid Shortlink - The Greek Directory</title>
+  <meta name="viewport" content="width=device-width, initial-scale
+  <!-- Favicon -->
+  <link rel="icon" href="https://social.thegreekdirectory.org/Logo2.png" sizes="32x32">
+  <link rel="apple-touch-icon" href="https://social.thegreekdirectory.org/Logo2.png">
+
+  <!-- Google Font: Bitter -->
+  <link href="https://fonts.googleapis.com/css2?family=Bitter:wght@400;500;700&display=swap" rel="stylesheet">
+
   <style>
-    @keyframes progress {
-      from { width: 0%; }
-      to   { width: 100%; }
+    * {
+      box-sizing: border-box;
+      font-family: 'Bitter', serif;
+    }
+
+    body {
+      margin: 0;
+      background: linear-gradient(135deg, #055193, #033b6d);
+      color: #212121FF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .container {
+      background: white;
+      padding: 3rem 2.5rem;
+      border-radius: 20px;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+      text-align: center;
+      max-width: 420px;
+      width: 90%;
+    }
+
+    .logo {
+      width: 120px;
+      margin-bottom: 1.5rem;
+    }
+
+    h1 {
+      font-size: 3.5rem;
+      margin: 0;
+      color: #212121FF;
+    }
+
+    p {
+      font-size: 1.1rem;
+      margin: 1rem 0 2rem;
+      color: #212121FF;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .buttons a,
+    .buttons button {
+      padding: 0.7rem 1.5rem;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      font-size: 1rem;
+      font-weight: 500;
+      background: #055193;
+      color: white;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    }
+
+    .buttons a:hover,
+    .buttons button:hover {
+      background: #04467f;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+    }
+    
+    /* Dark mode */
+    @media (prefers-color-scheme: dark) {
+      body {
+        background: linear-gradient(135deg, #1a3a5a, #0d2540);
+      }
+      
+      .container {
+        background: #2a2a2a;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.8);
+      }
+      
+      h1, p {
+        color: #e5e5e5;
+      }
     }
   </style>
-  <script>
-  setTimeout(function() {
-    window.location.replace("https://tgd.gr/reserved");
-  }, 300);
-  </script>
+</head>
+<body>
+  <div class="container">
+    <img src="https://social.thegreekdirectory.org/Logo2.png" alt="The Greek Directory logo" class="logo">
+    
+    <h1>Invalid Shortlink</h1>
+    <p>The shortlink "<code id="requested-url"></code>" is invalid. Check the URL and try again.</p>
+    
+    <div class="buttons">
+      <button onclick="history.back()">Go Back</button>
+      <a href="https://www.thegreekdirectory.org">Go to The Greek Directory</a>
+    </div>
+  </div>
+
+      <script>
+        // Get the current URL from the browser's window object
+        var requestedUrl = window.location.pathname;
+        
+        // Find the placeholder element and display the URL
+        var urlElement = document.getElementById('requested-url');
+        if (urlElement) {
+            urlElement.textContent = requestedUrl;
+        }
+    </script>
 </body>
 </html>
