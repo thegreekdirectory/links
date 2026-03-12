@@ -129,13 +129,11 @@
   
     	const params = new URLSearchParams(window.location.search);
     	if (params.get(SECRET_redirect_KEY) !== SECRET_redirect_VALUE) {
-	      // nothing
+				setTimeout(function() {
+      		window.location.replace("https://thegreekdirectory.org");
+     		}, 5000);
   	  }
-    	else {
-      	setTimeout(function() {
-      	window.location.replace("https://thegreekdirectory.org");
-     	}, 5000);
-    }})();
+    })();
 </script>
 </body>
 </html>
