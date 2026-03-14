@@ -34,9 +34,11 @@ export async function onRequest(context) {
 
   // 4. RULE: Supabase Dynamic Redirects
   const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_KEY);
-  const slug = path.replace(/^\//, ''); // Remove leading slash
+  
+  // FIX: Keep the original path (including the slash) to match what is saved in Supabase
+  const slug = path; 
 
-  if (slug) {
+  if (slug && slug !== '/') { // Prevent unnecessary DB lookups for the homepage
     const { data, error } = await supabase
       .from('shortlinks')
       .select('redirect_to')
