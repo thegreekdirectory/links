@@ -1,82 +1,93 @@
-import { createClient } from '@supabase/supabase-js';
-
 export async function onRequest(context) {
   const { request, env, ctx } = context;
-  const url = new URL(request.url);
+  const url  = new URL(request.url);
   const path = url.pathname;
 
-  // 1. RULE: Admin Bypass
+  // ── 1. ADMIN BYPASS ──────────────────────────────────────────────────────
   if (path.startsWith('/admin/')) return context.next();
 
-  // 2. RULE: Root Bypass
-  if ((path === '/' || path === '/index.html') && url.searchParams.get('redirect') === 'false') {
+  // ── 2. ROOT BYPASS  (tgd.gr/?redirect=false) ─────────────────────────────
+  if (
+    (path === '/' || path === '/index.html') &&
+    url.searchParams.get('redirect') === 'false'
+  ) {
     return context.next();
   }
 
-  const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_KEY);
   let destination = null;
-  let status = 302;
+  let status      = 302;
 
-  try {
-    // 3. RULE: Handle /go/*
-    if (path.startsWith('/go/')) {
-      const remainingPath = path.replace('/go/', '');
-      destination = `https://thegreekdirectory.org/${remainingPath}${url.search}${url.hash}`;
-      status = 301;
-    } 
-    // 4. RULE: Supabase Lookup (Removed .single() to prevent crash on 404)
-    else if (path !== '/' && path !== '/index.html') {
-      const { data, error } = await supabase
-        .from('shortlinks')
-        .select('redirect_to')
-        .eq('path', path)
-        .limit(1); // Use limit instead of single for safety
-      
-      if (data && data.length > 0) {
-        destination = data[0].redirect_to;
-      }
-    }
-
-    // --- ANALYTICS LOGIC ---
-    if (destination) {
-      const logAnalytics = async () => {
-        try {
-          // Fallback to empty strings if CF headers are missing to prevent 1101
-          const cf = request.cf || {}; 
-          await supabase.from('shortlink_events').insert({
-            path: path,
-            redirect_url: destination,
-            user_agent: request.headers.get('user-agent') || 'Unknown',
-            ip: request.headers.get('cf-connecting-ip') || '0.0.0.0',
-            city: cf.city || 'Unknown',
-            region: cf.region || 'Unknown',
-            country: cf.country || 'Unknown',
-            latitude: cf.latitude || 0,
-            longitude: cf.longitude || 0,
-            timezone: cf.timezone || 'UTC',
-            event_time: new Date().toISOString()
-          });
-        } catch (e) {
-          console.error("Analytics Background Error:", e);
-        }
-      };
-
-      ctx.waitUntil(logAnalytics());
-
-      return new Response(null, {
-        status: status,
-        headers: { 
-          'Location': destination, 
-          'X-Robots-Tag': 'noindex' 
-        },
-      });
-    }
-  } catch (globalError) {
-    // This prevents the 1101 error page from showing; 
-    // it will just fall through to your 404.html/index.html instead.
-    console.error("Worker Global Error:", globalError);
+  // ── 3. /go/ PROXY (301) ───────────────────────────────────────────────────
+  if (path.startsWith('/go/')) {
+    const rest = path.slice('/go/'.length);          // strip the /go/ prefix
+    destination = `https://thegreekdirectory.org/${rest}${url.search}${url.hash}`;
+    status      = 301;
   }
 
-  // 5. Fallback: If no destination found OR code crashed, show repo files
+  // ── 4. SUPABASE LOOKUP ────────────────────────────────────────────────────
+  else if (path !== '/' && path !== '/index.html') {
+    try {
+      const res = await fetch(
+        `${env.SUPABASE_URL}/rest/v1/shortlinks` +
+          `?select=redirect_to&path=eq.${encodeURIComponent(path)}&limit=1`,
+        {
+          headers: {
+            apikey:        env.SUPABASE_KEY,
+            Authorization: `Bearer ${env.SUPABASE_KEY}`,
+          },
+        }
+      );
+
+      if (res.ok) {
+        const rows = await res.json();
+        if (rows.length > 0 && rows[0].redirect_to) {
+          destination = rows[0].redirect_to;
+        }
+      } else {
+        console.error('[supabase] lookup failed:', res.status, await res.text());
+      }
+    } catch (err) {
+      console.error('[supabase] fetch error:', err);
+    }
+  }
+
+  // ── 5. REDIRECT + BACKGROUND ANALYTICS ───────────────────────────────────
+  if (destination) {
+    ctx.waitUntil(
+      fetch(`${env.SUPABASE_URL}/rest/v1/shortlink_events`, {
+        method: 'POST',
+        headers: {
+          apikey:          env.SUPABASE_KEY,
+          Authorization:   `Bearer ${env.SUPABASE_KEY}`,
+          'Content-Type':  'application/json',
+          Prefer:          'return=minimal',
+        },
+        body: JSON.stringify({
+          path,
+          redirect_url: destination,
+          user_agent:   request.headers.get('user-agent'),
+          ip:           request.headers.get('cf-connecting-ip'),
+          city:         request.cf?.city        ?? null,
+          region:       request.cf?.region      ?? null,
+          country:      request.cf?.country     ?? null,
+          latitude:     request.cf?.latitude    != null ? parseFloat(request.cf.latitude)  : null,
+          longitude:    request.cf?.longitude   != null ? parseFloat(request.cf.longitude) : null,
+          timezone:     request.cf?.timezone    ?? null,
+          event_time:   new Date().toISOString(),
+        }),
+      }).catch(err => console.error('[analytics] insert error:', err))
+    );
+
+    return new Response(null, {
+      status,
+      headers: {
+        Location:       destination,
+        'X-Robots-Tag': 'noindex',
+        'Cache-Control': 'no-store',
+      },
+    });
+  }
+
+  // ── 6. FALLBACK → serve repo file (custom 404 etc.) ──────────────────────
   return context.next();
 }
