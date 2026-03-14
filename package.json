@@ -1,9 +1,0 @@
-{
-  "name": "tgd-links",
-  "version": "1.0.0",
-  "description": "Redirect engine for tgd.gr",
-  "main": "index.js",
-  "dependencies": {
-    "@supabase/supabase-js": "^2.40.0"
-  }
-}
