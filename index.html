@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TGD Shortlink</title>
+  <link rel="icon" href="https://static.thegreekdirectory.org/img/logo/bluefavicon.png">
+  <style>
+    :root {
+      --blue: #1e3a8a;
+      --gray: #6b7280;
+      --bg: #f9fafb;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: #111827;
+      padding: 16px;
+    }
+
+    .card {
+      max-width: 520px;
+      width: 100%;
+      background: white;
+      border-radius: 14px;
+      padding: 24px 20px 28px;
+      text-align: center;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+    }
+
+    img {
+      width: 90px;
+      height: auto;
+      margin-bottom: 16px;
+    }
+
+    h2 {
+      margin: 16px 0 8px;
+      font-size: 1rem;
+      color: var(--blue);
+      letter-spacing: 0.5px;
+    }
+
+    p {
+      margin: 8px 0;
+      line-height: 1.5;
+      font-size: 0.95rem;
+    }
+
+    .muted {
+      color: var(--gray);
+      font-size: 0.9rem;
+    }
+
+    a {
+      color: var(--blue);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .divider {
+      margin: 18px 0;
+      height: 1px;
+      background: #e5e7eb;
+    }
+
+    footer {
+      margin-top: 18px;
+      font-size: 0.8rem;
+      color: var(--gray);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <img src="https://static.thegreekdirectory.org/img/logo/bluefavicon.svg" alt="The Greek Directory">
+
+    <h2>ENGLISH / ΑΓΓΛΙΚΑ</h2>
+    <p>
+      Welcome to The Greek Directory's official shortlink for smaller URLs!
+    </p>
+    <p class="muted">
+      If you see or click a URL beginning with <strong>tgd.gr</strong>, you can trust that it leads to a safe page of TGD.
+    </p>
+    <p>
+      Automatically redirecting you to The Greek Directory in 5 seconds...
+      <br>
+      <a href="https://thegreekdirectory.org">Click here if you're not redirected automatically.</a>
+    </p>
+
+    <div class="divider"></div>
+
+    <h2>ΕΛΛΗΝΙΚΑ / GREEK</h2>
+    <p>
+      Καλώς ορίσατε στον επίσημο σύνδεσμο του Ελληνικού Καταλόγου για μικρότερες διευθύνσεις URL!
+    </p>
+    <p class="muted">
+      Εάν δείτε ή κάνετε κλικ σε μια διεύθυνση URL που ξεκινά με <strong>tgd.gr</strong>, μπορείτε να είστε σίγουροι ότι οδηγεί σε μια ασφαλή σελίδα του Ελληνικού Καταλόγου.
+    </p>
+    <p>
+      Αυτόματη ανακατεύθυνση στον Ελληνικό Κατάλογο σε 5 δευτερόλεπτα...
+      <br>
+      <a href="https://thegreekdirectory.org">Κάντε κλικ εδώ εάν δεν ανακατευθυνθείτε αυτόματα.</a>
+    </p>
+
+    <footer>
+      © The Greek Directory
+    </footer>
+  </div>
+  <script>
+  (function(){
+  	const SECRET_redirect_KEY = "redirect";
+  	const SECRET_redirect_VALUE = "false";
+  
+    	const params = new URLSearchParams(window.location.search);
+    	if (params.get(SECRET_redirect_KEY) !== SECRET_redirect_VALUE) {
+				setTimeout(function() {
+      		window.location.replace("https://thegreekdirectory.org");
+     		}, 5000);
+  	  }
+    })();
+</script>
+</body>
+</html>
