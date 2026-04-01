@@ -274,26 +274,7 @@
   .about-body strong { color: var(--fog); font-weight: 400; }
   .about-signature { font-family: var(--serif); font-size: 1.8rem; font-style: italic; color: var(--gold); margin-top: 2rem; }
   .about-signature-title { font-family: var(--condensed); font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--mist); margin-top: 0.3rem; }
-
-  /* BEFORE/AFTER */
-  .before-after { padding: 7rem 0 5rem; background: var(--ink-2); }
-  .ba-header { text-align: center; margin-bottom: 3rem; }
-  .ba-header .section-label { justify-content: center; }
-  .ba-header .section-label::before { display: none; }
-  .ba-header p { font-size: 0.95rem; color: var(--mist); margin-top: 0.75rem; max-width: 500px; margin-left: auto; margin-right: auto; line-height: 1.65; }
-  .ba-wrapper { position: relative; max-width: 900px; margin: 0 auto; user-select: none; cursor: ew-resize; border: 1px solid rgba(201,168,76,0.2); overflow: hidden; }
-  .ba-after-img { display: block; width: 100%; height: auto; max-height: 560px; object-fit: cover; pointer-events: none; }
-  .ba-before-layer { position: absolute; inset: 0; overflow: hidden; width: 50%; }
-  .ba-before-layer img { position: absolute; top: 0; left: 0; width: 900px; max-width: none; height: 100%; object-fit: cover; pointer-events: none; }
-  .ba-divider { position: absolute; top: 0; bottom: 0; left: 50%; width: 3px; background: var(--gold); transform: translateX(-50%); z-index: 10; pointer-events: none; }
-  .ba-handle { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 3rem; height: 3rem; background: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 11; box-shadow: 0 0 0 4px rgba(201,168,76,0.25), 0 4px 20px rgba(0,0,0,0.5); pointer-events: none; }
-  .ba-handle svg { color: var(--ink); }
-  .ba-label { position: absolute; bottom: 1.25rem; font-family: var(--condensed); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; padding: 0.35rem 0.9rem; z-index: 12; pointer-events: none; }
-  .ba-label-before { left: 1rem; background: rgba(10,10,12,0.8); color: var(--fog); border: 1px solid rgba(201,168,76,0.2); }
-  .ba-label-after { right: 1rem; background: var(--gold); color: var(--ink); }
-  .ba-caption { max-width: 900px; margin: 1.25rem auto 0; font-size: 0.82rem; color: var(--mist); font-style: italic; text-align: center; }
-  .ba-caption strong { color: var(--gold); font-style: normal; }
-
+  
   /* FEATURES STRIP */
   .features-strip { background: var(--ink-3); border-top: 1px solid rgba(201,168,76,0.1); border-bottom: 1px solid rgba(201,168,76,0.1); padding: 3rem 0; }
   .features-list { display: flex; justify-content: space-between; align-items: center; gap: 2rem; }
@@ -594,32 +575,6 @@
   </div>
 </section>
 
-<!-- BEFORE / AFTER -->
-<section class="before-after">
-  <div class="section-inner">
-    <div class="ba-header">
-      <p class="section-label reveal">Real Work, Real Results</p>
-      <h2 class="section-title reveal">See the <em>Difference.</em></h2>
-      <p class="reveal">A customer-sourced bumper — brought in raw from a junkyard, then cleaned, filled, and painted to perfection by the Lekas team. Drag the slider to compare.</p>
-    </div>
-  </div>
-  <div style="max-width:960px;margin:0 auto;padding:0 1.25rem;">
-    <div class="ba-wrapper reveal" id="ba-wrapper">
-      <img class="ba-after-img" src="https://s3-media0.fl.yelpcdn.com/bphoto/Dcq2gcVPxq_45dHSpGsWLQ/o.jpg" alt="After — bumper painted to perfection at Lekas Auto Construction" loading="lazy">
-      <div class="ba-before-layer" id="ba-before">
-        <img src="https://s3-media0.fl.yelpcdn.com/bphoto/G3_SNiUmLqrZnTKMygQccg/348s.jpg" alt="Before — raw bumper prior to Lekas Auto repair" loading="lazy">
-      </div>
-      <div class="ba-divider" id="ba-divider"></div>
-      <div class="ba-handle" id="ba-handle">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l-6-6 6-6M15 6l6 6-6 6"/></svg>
-      </div>
-      <span class="ba-label ba-label-before">Before</span>
-      <span class="ba-label ba-label-after">After</span>
-    </div>
-    <p class="ba-caption reveal"><strong>Bumper cleaned, filled &amp; painted to perfection</strong> — same-day turnaround. Photo credit: EM P. via Yelp, 2020.</p>
-  </div>
-</section>
-
 <!-- FEATURES STRIP -->
 <div class="features-strip">
   <div class="section-inner">
@@ -880,34 +835,6 @@
     });
   }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
   reveals.forEach(el => obs.observe(el));
-
-  /* Before / After slider */
-  (function() {
-    const wrap   = document.getElementById('ba-wrapper');
-    const before = document.getElementById('ba-before');
-    const div    = document.getElementById('ba-divider');
-    const handle = document.getElementById('ba-handle');
-    let drag = false;
-
-    function setPos(pct) {
-      pct = Math.max(3, Math.min(97, pct));
-      before.style.width = pct + '%';
-      div.style.left     = pct + '%';
-      handle.style.left  = pct + '%';
-    }
-    function fromEvent(x) {
-      const r = wrap.getBoundingClientRect();
-      return ((x - r.left) / r.width) * 100;
-    }
-
-    wrap.addEventListener('mousedown',  e => { drag = true;  setPos(fromEvent(e.clientX)); e.preventDefault(); });
-    window.addEventListener('mousemove', e => { if (drag) setPos(fromEvent(e.clientX)); });
-    window.addEventListener('mouseup',   () => drag = false);
-
-    wrap.addEventListener('touchstart', e => { drag = true;  setPos(fromEvent(e.touches[0].clientX)); }, { passive: true });
-    window.addEventListener('touchmove', e => { if (drag) setPos(fromEvent(e.touches[0].clientX)); }, { passive: true });
-    window.addEventListener('touchend',  () => drag = false);
-  })();
 </script>
 </body>
 </html>
